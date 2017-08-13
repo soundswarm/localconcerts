@@ -1,5 +1,50 @@
+/**{
+ margin: 0;
+ padding: 0;
+ text-align: center;
+}*/
 body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+  /*height: 100%;*/
+  background-color: black;
+  background-size: cover;
+  height: 100%;
+}
+.app {
+  background-color: black;
+  background-size: cover;
+  color: white;
+  font-family: 'Montserrat',Circular,Helvetica,Arial,sans-serif;
+  width: 100%;
+  padding-top: 15px;
+  height: 100%;
+}
+.title {
+  margin-bottom: 30px;
+  font-size: 18px;
+  font-weight: bold;
+}
+.subtitle {
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+.playText{
+  font-weight: bold;
+}
+.embed-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+    height: 100%;
+}
+.embed-container iframe,
+.embed-container object,
+.embed-container embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
 }
