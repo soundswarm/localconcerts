@@ -6,13 +6,13 @@ class Callback extends Component {
   componentDidMount() {
     var url = 'https://api.spotify.com/v1/';
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
-    OAuth.callback('spotify').done(function(spotify, a) {
+    OAuth.callback('spotify').done(function(spotify) {
       // window.addEventListener('hashchange', router);
       // // Listen on page load:
       // window.addEventListener('load', router);
       console.log('href', document.location.href);
 
-      console.log('res', spotify, a);
+      console.log('res', spotify);
       var accessToken = spotify.access_token;
 
       const ax = axios.create({

@@ -2,19 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import Callback from './Callback'
-import Home from './Home'
+import Listen from './Listen';
 import registerServiceWorker from './registerServiceWorker';
 import {Router, Route, Redirect} from 'react-router';
 import createBrowserHistory from 'history/createBrowserHistory';
 const history = createBrowserHistory();
 ReactDOM.render(
   <Router history={history}>
-  <div>
-    <Route exact path="/" component={App}/>
+    <div>
+      <Route exact path="/" component={App} />
 
-    // <Route path="/home" component={Home}/>
-    <Route path="/listen" component={Callback}/>
+      <Route path="/listen" component={Listen} />
     </div>
   </Router>,
   document.getElementById('root'),
