@@ -11,10 +11,10 @@ const history = createBrowserHistory();
 ReactDOM.render(
   <Router history={history}>
   <div>
-    <Route exact path="/" component={App}/>
+    <Route path="/" component={App}/>
 
-    <Route path="/home" component={Home}/>
-    <Route path="/callback" component={Callback}/>
+    // <Route path="/home" component={Home}/>
+    // <Route path="/callback" component={Callback}/>
     </div>
   </Router>,
   document.getElementById('root'),
