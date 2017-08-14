@@ -5,8 +5,9 @@ const axios = window.axios;
 console.log('ww', window.location)
 class App extends Component {
   componentDidMount() {
+    
     var url = 'https://api.spotify.com/v1/';
-    OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
+    OAuth.ini3tialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
     OAuth.popup('spotify').done(function(spotify, a) {
       // window.addEventListener('hashchange', router);
       // // Listen on page load:
