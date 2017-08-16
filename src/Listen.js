@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import './App.css';
-const OAuth = window.OAuth
-const axios = window.axios
+const OAuth = window.OAuth;
+const axios = window.axios;
 class Callback extends Component {
   componentDidMount() {
     var url = 'https://api.spotify.com/v1/';
+    console.log('OAUTH', OAuth.callback);
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
-    OAuth.callback('spotify').done(function(spotify) {
+    OAuth.callback('spotify', {cache: true}).done(function(spotify) {
       // window.addEventListener('hashchange', router);
       // // Listen on page load:
       // window.addEventListener('load', router);
