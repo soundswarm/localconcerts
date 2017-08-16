@@ -5,7 +5,7 @@ class App extends Component {
   componentDidMount() {
     var url = 'https://api.spotify.com/v1/';
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
-    OAuth.redirect('spotify', window.location.origin + '/listen');
+    OAuth.redirect('spotify', window.location.origin + '#/listen');
   }
   render() {
     return <div>app</div>;

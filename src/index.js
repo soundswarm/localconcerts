@@ -4,16 +4,17 @@ import './index.css';
 import App from './App';
 import Listen from './Listen';
 import registerServiceWorker from './registerServiceWorker';
-import {Router, Route, Redirect} from 'react-router';
+// import {Router, Route, Redirect} from 'react-router';
+import {  HashRouter,  Route,  Redirect} from 'react-router-dom';
 import createBrowserHistory from 'history/createBrowserHistory';
 const history = createBrowserHistory();
 ReactDOM.render(
-  <Router history={history}>
+  <HashRouter>
     <div>
       <Route exact path="/" component={App} />
       <Route path="/listen" component={Listen} />
     </div>
-  </Router>,
+  </HashRouter>,
   document.getElementById('root'),
 );
 registerServiceWorker();
