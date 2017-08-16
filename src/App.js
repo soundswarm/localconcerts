@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
 const OAuth = window.OAuth;
-const axios = window.axios;
 class App extends Component {
   componentDidMount() {
     var url = 'https://api.spotify.com/v1/';

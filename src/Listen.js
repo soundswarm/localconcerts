@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import './App.css';
+import axios from 'axios'
 const OAuth = window.OAuth;
-const axios = window.axios;
 class Listen extends Component {
   componentDidMount() {
     var url = 'https://api.spotify.com/v1/';
