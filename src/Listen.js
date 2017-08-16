@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import './App.css';
 const OAuth = window.OAuth;
 const axios = window.axios;
-class Callback extends Component {
+class Listen extends Component {
   componentDidMount() {
     var url = 'https://api.spotify.com/v1/';
     console.log('OAUTH', OAuth.callback);
@@ -169,4 +169,4 @@ class Callback extends Component {
   }
 }
 
-export default Callback;
+export default Listen;
