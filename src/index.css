@@ -17,6 +17,24 @@ body {
   text-align: center;
   height: 100%
 }
+.concert:hover {
+    color: red;
+    cursor: pointer;
+}
+.concerts {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.concerts .table-responsive {
+  margin: auto;
+  margin-bottom: 30px;
+}
+
+.concerts a:hover {
+  color: red;
+}
 .title {
   margin-bottom: 30px;
   font-size: 18px;

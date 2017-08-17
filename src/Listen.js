@@ -1,18 +1,18 @@
 import React, {Component} from 'react';
 import './App.css';
-import axios from 'axios'
+import axios from 'axios';
+import {Table} from 'react-bootstrap';
 const OAuth = window.OAuth;
 class Listen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {artistsConcerts: []};
+  }
   componentDidMount() {
+    const that = this;
     var url = 'https://api.spotify.com/v1/';
-    console.log('OAUTH', OAuth.callback);
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
     OAuth.callback('spotify', {cache: true}).done(function(spotify) {
-      // window.addEventListener('hashchange', router);
-      // // Listen on page load:
-      // window.addEventListener('load', router);
-      console.log('href', document.location.href);
-
       console.log('res', spotify);
       var accessToken = spotify.access_token;
 
@@ -38,20 +38,8 @@ class Listen extends Component {
         }).then(r => {
           const playListId = r.data.id;
           let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
-          console.log('re.data', r.data);
-
-          // uri = 'https://open.spotify.com/embed?uri=' + uri;
-          ('spotify:user:symbioticshift:playlist:7cQr8P6M4TbkeflwfNzzAu');
-          // const workuri = 'https://open.spotify.com/embed?uri=spotify:user:symbioticshift:playlist:3kPchRaFQmqCgrTRyugtGD';
-          // console.log('URI', uri);
-          // console.log('WORKURI', workuri);
-          // console.log('re.d', r.data);
-          //
-          // const iframe = document.querySelector('.player');
-          // console.log('ifrane', iframe);
-          // iframe.src = uri;
           artistsPlayingConcerts().then(artists => {
-            console.log('ARTISTS', artists);
+            // console.log('ARTISTS', artists);
             artists = Array.from(
               artists.reduce(
                 (mem, artist) => {
@@ -67,42 +55,42 @@ class Listen extends Component {
                 },
               ).arts,
             );
-            // console.log('ARTISTS.LENGTH', artists.length);
 
-            artists.forEach(artistName => {
-              const url = `https://api.spotify.com/v1/search?q=${artistName}&type=artist`;
-              spotify.get(url).done(res => {
-                const artistId = res.artists.items[0].id;
-                // console.log('spotify', res);
-                ax({
-                  url: `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,
-                  method: 'get',
-                  params: {country: 'US'},
-                }).then(res => {
-                  const topTracksUris = res.data.tracks.map(track => track.uri);
-                  const topTwoTracksUris = [];
-                  for (let i = 0; i < 2; i++) {
-                    if (topTracksUris[i]) {
-                      topTwoTracksUris.push(topTracksUris[i]);
-                    }
+            that.setState({artistsConcerts: artists});
+            Promise.all(
+              artists.map(({artistName, concert}) => {
+                const url = `https://api.spotify.com/v1/search?q=${artistName}&type=artist`;
+                return spotify.get(url).done(res => {
+                  if (res.artists.items.length <= 0) {
+                    return '';
                   }
-                  // console.log('topTwoTracksUris', topTwoTracksUris);
-                  ax({
-                    method: 'post',
-                    url: `https://api.spotify.com/v1/users/${spotifyUserId}/playlists/${playListId}/tracks`,
-                    data: {uris: topTwoTracksUris},
-                  }).then(r => {
-                    // uri="https://open.spotify.com/embed?uri="+uri
-                    const workuri = 'https://open.spotify.com/embed?uri=spotify:user:symbioticshift:playlist:3kPchRaFQmqCgrTRyugtGD';
-                    console.log('URI', uri);
-                    console.log('WORKURI', workuri);
-
-                    const iframe = document.querySelector('.player');
-                    console.log('ifrane', iframe);
-                    iframe.src = uri;
+                  const artistId = res.artists.items[0].id;
+                  return ax({
+                    url: `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,
+                    method: 'get',
+                    params: {country: 'US'},
+                  }).then(res => {
+                    const topTracksUris = res.data.tracks.map(
+                      track => track.uri,
+                    );
+                    const topTwoTracksUris = [];
+                    for (let i = 0; i < 2; i++) {
+                      if (topTracksUris[i]) {
+                        topTwoTracksUris.push(topTracksUris[i]);
+                      }
+                    }
+                    // console.log('topTwoTracksUris', topTwoTracksUris);
+                    return ax({
+                      method: 'post',
+                      url: `https://api.spotify.com/v1/users/${spotifyUserId}/playlists/${playListId}/tracks`,
+                      data: {uris: topTwoTracksUris},
+                    });
                   });
                 });
-              });
+              }),
+            ).then(() => {
+              const iframe = document.querySelector('.player');
+              iframe.src = uri;
             });
           });
         });
@@ -127,11 +115,13 @@ class Listen extends Component {
           params: {apikey: 'Z7OwHVINevycipT7'},
         }).then(function(res) {
           const concerts = res.data.resultsPage.results.event;
+          console.log('CONCERTS', concerts);
           const artists = [];
+
           concerts.forEach(concert => {
             concert.performance.forEach(artist => {
               const artistName = artist.artist.displayName;
-              artists.push(artistName);
+              artists.push({artistName, concert});
             });
           });
           return artists;
@@ -139,7 +129,9 @@ class Listen extends Component {
       });
     }
   }
+
   render() {
+    console.log('thisconcc', this.state.artistsConcerts);
     return (
       <div className="app">
         <div className="title">
@@ -147,6 +139,27 @@ class Listen extends Component {
           <div>
             CODE
           </div>
+        </div>
+        <div className="concerts">
+          <Table responsive>
+            <tbody>
+              {this.state.artistsConcerts.map(({artistName, concert}) => {
+                return (
+                  <tr className="concert" onClick={() => window.open(concert.uri, '_blank')}>
+
+                    <td> {artistName} </td>
+
+                    <td>
+                        {concert.start.date}
+                    </td>
+
+                    <td>{concert.venue.displayName}</td>
+
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
         </div>
 
         <div className="subtitle">
@@ -156,14 +169,17 @@ class Listen extends Component {
           {' '}
           to generate a Spotify playlist of bands with upcoming shows in your area.
         </div>
+
         <div className="embed-container">
           <iframe
+            title="spotifyplayer"
             className="player"
             src=""
             frameBorder="0"
             allowTransparency="true"
           />
         </div>
+
       </div>
     );
   }
