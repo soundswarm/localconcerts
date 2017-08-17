@@ -27,7 +27,8 @@ class Listen extends Component {
       spotify.me().done(function(data) {
         const spotifyUserId = data.id;
 
-        const playlist = new Date().toLocaleDateString();
+        let playlist = new Date().toLocaleDateString();
+        playlist = `MC-${playlist}`
 
         const u = `${url}users/${spotifyUserId}/playlists`;
 
@@ -135,9 +136,9 @@ class Listen extends Component {
     return (
       <div className="app">
         <div className="title">
-          MUSIC
+          LOCAL
           <div>
-            CODE
+            CONCERTS
           </div>
         </div>
         <div className="concerts">
@@ -167,7 +168,7 @@ class Listen extends Component {
           {' '}
           <span className="playText">PLAY</span>
           {' '}
-          to generate a Spotify playlist of bands with upcoming shows in your area.
+          to listen to your Spotify playlist of these bands.
         </div>
 
         <div className="embed-container">
