@@ -44,7 +44,7 @@ class Listen extends Component {
             artists = Array.from(
               artists.reduce(
                 (mem, artist) => {
-                  if (mem.i <= 10) {
+                  if (mem.i <= 30) {
                     mem.arts.push(artist);
                   }
                   mem.i++;
@@ -75,7 +75,7 @@ class Listen extends Component {
                       track => track.uri,
                     );
                     const topTwoTracksUris = [];
-                    for (let i = 0; i < 2; i++) {
+                    for (let i = 0; i < 1; i++) {
                       if (topTracksUris[i]) {
                         topTwoTracksUris.push(topTracksUris[i]);
                       }
