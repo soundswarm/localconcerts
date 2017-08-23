@@ -2,11 +2,13 @@ import React, {Component} from 'react';
 import './App.css';
 import axios from 'axios';
 import {Table} from 'react-bootstrap';
+import moment from 'moment';
 const OAuth = window.OAuth;
 class Listen extends Component {
   constructor(props) {
     super(props);
     this.state = {artistsConcerts: []};
+    this.store = {};
   }
   componentDidMount() {
     const that = this;
@@ -28,7 +30,7 @@ class Listen extends Component {
         const spotifyUserId = data.id;
 
         let playlist = new Date().toLocaleDateString();
-        playlist = `MC-${playlist}`
+        playlist = `MC-${playlist}`;
 
         const u = `${url}users/${spotifyUserId}/playlists`;
 
@@ -91,13 +93,41 @@ class Listen extends Component {
               }),
             ).then(() => {
               const iframe = document.querySelector('.player');
+              observeArtistPlaying();
               iframe.src = uri;
+              console.log('URI', uri);
             });
           });
         });
       });
     });
+    function observeArtistPlaying() {
+      console.log('asdfsdf');
+      MutationObserver = window.MutationObserver ||
+        window.WebKitMutationObserver;
 
+      var observer = new MutationObserver(function(mutations, observer) {
+        // fired when a mutation occurs
+        console.log('utantts', mutations, observer);
+
+        const player = document.querySelector('.player');
+        var innerDoc = player.contentDocument || player.contentWindow.document;
+        console.log('INNERDOC', innerDoc);
+        // get artist playing
+        const artists = innerDoc.querySelector('body');
+        console.log('ARTISTS', artists);
+      });
+
+      // define what element should be observed by the observer
+      // and what types of mutations trigger the callback
+      const player = document.querySelector('iframe');
+      observer.observe(player, {
+        subtree: true,
+        attributes: true,
+        childList: true,
+        characterData: true
+      });
+    }
     function artistsPlayingConcerts() {
       const sK = 'https://api.songkick.com/api/3.0/';
       const sKSearch = sK + 'search/locations.json';
@@ -116,7 +146,6 @@ class Listen extends Component {
           params: {apikey: 'Z7OwHVINevycipT7'},
         }).then(function(res) {
           const concerts = res.data.resultsPage.results.event;
-          console.log('CONCERTS', concerts);
           const artists = [];
 
           concerts.forEach(concert => {
@@ -132,7 +161,6 @@ class Listen extends Component {
   }
 
   render() {
-    console.log('thisconcc', this.state.artistsConcerts);
     return (
       <div className="app">
         <div className="title">
@@ -141,19 +169,22 @@ class Listen extends Component {
             CONCERTS
           </div>
         </div>
+
         <div className="concerts">
+
           <Table responsive>
             <tbody>
-              {this.state.artistsConcerts.map(({artistName, concert}) => {
+              {this.state.artistsConcerts.map(({artistName, concert}, i) => {
                 return (
-                  <tr className="concert" onClick={() => window.open(concert.uri, '_blank')}>
-
+                  <tr
+                    key={i}
+                    className="concert"
+                    onClick={() => window.open(concert.uri, '_blank')}
+                  >
                     <td> {artistName} </td>
-
                     <td>
-                        {concert.start.date}
+                      {moment(concert.start.date).format('MMM D')}
                     </td>
-
                     <td>{concert.venue.displayName}</td>
 
                   </tr>
