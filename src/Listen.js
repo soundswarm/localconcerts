@@ -10,26 +10,31 @@ class Listen extends Component {
     this.state = {artistsConcerts: []};
     this.store = {};
   }
+  getPlaylists = () => {
+    // return ax({
+    //   method: 'get',
+    //   url: `${url}users/${that.spotifyUserId}/playlists`,
+    //   data: {name: playlist},
+    // })
+  };
   componentDidMount() {
     const that = this;
     var url = 'https://api.spotify.com/v1/';
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
+
     OAuth.callback('spotify', {cache: true}).done(function(spotify) {
       console.log('res', spotify);
-      var accessToken = spotify.access_token;
+      this.accessToken = spotify.access_token;
 
       const ax = axios.create({
-        headers: {Authorization: 'Bearer ' + accessToken},
+        headers: {Authorization: 'Bearer ' + this.accessToken},
       });
-
 
       spotify.me().done(function(data) {
         that.spotifyUserId = data.id;
 
         let playlist = new Date().toLocaleDateString();
         playlist = `MC-${playlist}`;
-
-
 
         ax({
           method: 'post',
@@ -122,7 +127,7 @@ class Listen extends Component {
         subtree: true,
         attributes: true,
         childList: true,
-        characterData: true
+        characterData: true,
       });
     }
     function artistsPlayingConcerts() {
