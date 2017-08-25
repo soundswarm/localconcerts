@@ -21,10 +21,7 @@ class Listen extends Component {
       const ax = axios.create({
         headers: {Authorization: 'Bearer ' + accessToken},
       });
-      ax({
-        method: 'get',
-        url: url + 'browse/featured-playlists',
-      }).then(r => console.log('acsx', r));
+  
 
       spotify.me().done(function(data) {
         const spotifyUserId = data.id;
@@ -32,11 +29,11 @@ class Listen extends Component {
         let playlist = new Date().toLocaleDateString();
         playlist = `MC-${playlist}`;
 
-        const u = `${url}users/${spotifyUserId}/playlists`;
+
 
         ax({
           method: 'post',
-          url: u,
+          url: `${url}users/${spotifyUserId}/playlists`,
           data: {name: playlist},
         }).then(r => {
           const playListId = r.data.id;
@@ -172,7 +169,7 @@ class Listen extends Component {
 
         <div className="concerts">
 
-          <Table responsive>
+          <table>
             <tbody>
               {this.state.artistsConcerts.map(({artistName, concert}, i) => {
                 return (
@@ -191,15 +188,7 @@ class Listen extends Component {
                 );
               })}
             </tbody>
-          </Table>
-        </div>
-
-        <div className="subtitle">
-          Click
-          {' '}
-          <span className="playText">PLAY</span>
-          {' '}
-          to listen to your Spotify playlist of these bands.
+          </table>
         </div>
 
         <div className="embed-container">
