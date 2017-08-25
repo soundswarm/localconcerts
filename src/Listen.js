@@ -26,17 +26,17 @@ class Listen extends Component {
       console.log('res', spotify);
       this.accessToken = spotify.access_token;
 
-      const ax = axios.create({
+      this.ax = axios.create({
         headers: {Authorization: 'Bearer ' + this.accessToken},
       });
 
-      spotify.me().done(function(data) {
+      spotify.me().done((data) =>{
         that.spotifyUserId = data.id;
 
         let playlist = new Date().toLocaleDateString();
         playlist = `MC-${playlist}`;
 
-        ax({
+        this.ax({
           method: 'post',
           url: `${url}users/${that.spotifyUserId}/playlists`,
           data: {name: playlist},
@@ -70,7 +70,7 @@ class Listen extends Component {
                     return '';
                   }
                   const artistId = res.artists.items[0].id;
-                  return ax({
+                  return this.ax({
                     url: `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,
                     method: 'get',
                     params: {country: 'US'},
@@ -85,7 +85,7 @@ class Listen extends Component {
                       }
                     }
                     // console.log('topTwoTracksUris', topTwoTracksUris);
-                    return ax({
+                    return this.ax({
                       method: 'post',
                       url: `https://api.spotify.com/v1/users/${that.spotifyUserId}/playlists/${playListId}/tracks`,
                       data: {uris: topTwoTracksUris},
