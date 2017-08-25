@@ -16,14 +16,14 @@ class Listen extends Component {
       method: 'get',
       url: `${url}users/${this.spotifyUserId}/playlists`,
       data: {name: this.playlist},
-    })
+    });
   };
   componentDidMount() {
     const that = this;
 
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
 
-    OAuth.callback('spotify', {cache: true}).done(function(spotify) {
+    OAuth.callback('spotify', {cache: true}).done((spotify) =>{
       console.log('res', spotify);
       this.accessToken = spotify.access_token;
 
@@ -36,7 +36,7 @@ class Listen extends Component {
 
         let playlist = new Date().toLocaleDateString();
         this.playlist = `MC-${playlist}`;
-
+        this.getPlaylists().then(r => {});
         this.ax({
           method: 'post',
           url: `${url}users/${that.spotifyUserId}/playlists`,

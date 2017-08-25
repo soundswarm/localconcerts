@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
 import {Button, ButtonToolbar} from 'react-bootstrap';
-console.log('BUTTON', Button);
 const OAuth = window.OAuth;
 
 class App extends Component {
