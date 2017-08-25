@@ -21,10 +21,10 @@ class Listen extends Component {
       const ax = axios.create({
         headers: {Authorization: 'Bearer ' + accessToken},
       });
-  
+
 
       spotify.me().done(function(data) {
-        const spotifyUserId = data.id;
+        that.spotifyUserId = data.id;
 
         let playlist = new Date().toLocaleDateString();
         playlist = `MC-${playlist}`;
@@ -33,7 +33,7 @@ class Listen extends Component {
 
         ax({
           method: 'post',
-          url: `${url}users/${spotifyUserId}/playlists`,
+          url: `${url}users/${that.spotifyUserId}/playlists`,
           data: {name: playlist},
         }).then(r => {
           const playListId = r.data.id;
@@ -82,7 +82,7 @@ class Listen extends Component {
                     // console.log('topTwoTracksUris', topTwoTracksUris);
                     return ax({
                       method: 'post',
-                      url: `https://api.spotify.com/v1/users/${spotifyUserId}/playlists/${playListId}/tracks`,
+                      url: `https://api.spotify.com/v1/users/${that.spotifyUserId}/playlists/${playListId}/tracks`,
                       data: {uris: topTwoTracksUris},
                     });
                   });
