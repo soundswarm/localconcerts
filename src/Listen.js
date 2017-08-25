@@ -4,6 +4,7 @@ import axios from 'axios';
 import {Table} from 'react-bootstrap';
 import moment from 'moment';
 const OAuth = window.OAuth;
+const url = 'https://api.spotify.com/v1/';
 class Listen extends Component {
   constructor(props) {
     super(props);
@@ -11,15 +12,15 @@ class Listen extends Component {
     this.store = {};
   }
   getPlaylists = () => {
-    // return ax({
-    //   method: 'get',
-    //   url: `${url}users/${that.spotifyUserId}/playlists`,
-    //   data: {name: playlist},
-    // })
+    return this.ax({
+      method: 'get',
+      url: `${url}users/${this.spotifyUserId}/playlists`,
+      data: {name: this.playlist},
+    })
   };
   componentDidMount() {
     const that = this;
-    var url = 'https://api.spotify.com/v1/';
+
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
 
     OAuth.callback('spotify', {cache: true}).done(function(spotify) {
@@ -30,11 +31,11 @@ class Listen extends Component {
         headers: {Authorization: 'Bearer ' + this.accessToken},
       });
 
-      spotify.me().done((data) =>{
+      spotify.me().done(data => {
         that.spotifyUserId = data.id;
 
         let playlist = new Date().toLocaleDateString();
-        playlist = `MC-${playlist}`;
+        this.playlist = `MC-${playlist}`;
 
         this.ax({
           method: 'post',
