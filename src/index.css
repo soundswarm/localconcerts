@@ -15,7 +15,10 @@ body {
   width: 100%;
   padding-top: 15px;
   text-align: center;
-  height: 100%
+  height: 100%;
+  /*display: flex;*/
+  /*flex-direction: column;*/
+  /*align-items: center;*/
 }
 .concert:hover {
     color: red;
@@ -27,7 +30,7 @@ body {
   align-items: center;
 }
 
-.concerts .table-responsive {
+.concerts table {
   margin: auto;
   margin-bottom: 30px;
 

@@ -3,6 +3,8 @@ import './App.css';
 import axios from 'axios';
 import {Table} from 'react-bootstrap';
 import moment from 'moment';
+import _ from 'lodash';
+
 const OAuth = window.OAuth;
 const url = 'https://api.spotify.com/v1/';
 class Listen extends Component {
@@ -18,9 +20,11 @@ class Listen extends Component {
       limit: 50,
     });
   };
-  componentDidMount() {
-    const that = this;
 
+  componentDidMount() {
+    if (_.isNil(OAuth)) {
+      this.context.router.push('/');
+    }
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
 
     OAuth.callback('spotify', {cache: true}).done(spotify => {
@@ -32,52 +36,35 @@ class Listen extends Component {
       });
 
       spotify.me().done(data => {
-        that.spotifyUserId = data.id;
+        this.spotifyUserId = data.id;
 
         let playlist = new Date().toLocaleDateString();
         this.playlist = `MC-${playlist}`;
         this.getPlaylists().then(res => {
-          console.log(res.data.items)
           const playlist = res.data.items.filter(playlist => {
-
-            console.log('PLAYLIST.NAME === THIS.PLAYLIST', playlist.name,this.playlist)
             return playlist.name === this.playlist;
           })[0];
-          console.log('PLAYLIST', playlist)
           if (playlist) {
-            console.log('CONDITION PASSED')
-            let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri
+            let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
             const iframe = document.querySelector('.player');
             iframe.src = uri;
+            artistsPlayingConcerts().then(artists => {
+              this.setState({artistsConcerts: artists.slice(0, 30)});
+            });
             return;
           }
 
           this.ax({
             method: 'post',
-            url: `${url}users/${that.spotifyUserId}/playlists`,
+            url: `${url}users/${this.spotifyUserId}/playlists`,
             data: {name: this.playlist},
           }).then(r => {
             const playListId = r.data.id;
             let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
             artistsPlayingConcerts().then(artists => {
               // console.log('ARTISTS', artists);
-              artists = Array.from(
-                artists.reduce(
-                  (mem, artist) => {
-                    if (mem.i <= 30) {
-                      mem.arts.push(artist);
-                    }
-                    mem.i++;
-                    return mem;
-                  },
-                  {
-                    i: 0,
-                    arts: [],
-                  },
-                ).arts,
-              );
 
-              that.setState({artistsConcerts: artists});
+              this.setState({artistsConcerts: artists.slice(0, 30)});
               Promise.all(
                 artists.map(({artistName, concert}) => {
                   const url = `https://api.spotify.com/v1/search?q=${artistName}&type=artist`;
@@ -103,7 +90,7 @@ class Listen extends Component {
                       // console.log('topTwoTracksUris', topTwoTracksUris);
                       return this.ax({
                         method: 'post',
-                        url: `https://api.spotify.com/v1/users/${that.spotifyUserId}/playlists/${playListId}/tracks`,
+                        url: `https://api.spotify.com/v1/users/${this.spotifyUserId}/playlists/${playListId}/tracks`,
                         data: {uris: topTwoTracksUris},
                       });
                     });
@@ -227,4 +214,7 @@ class Listen extends Component {
   }
 }
 
+Listen.contextTypes = {
+  router: React.PropTypes.object,
+};
 export default Listen;
