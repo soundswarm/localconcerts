@@ -28,7 +28,6 @@ class Listen extends Component {
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
 
     OAuth.callback('spotify', {cache: true}).done(spotify => {
-      console.log('res', spotify);
       this.accessToken = spotify.access_token;
 
       this.ax = axios.create({

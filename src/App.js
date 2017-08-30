@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
 import {Button, ButtonToolbar} from 'react-bootstrap';
-const OAuth = window.OAuth;
 
 class App extends Component {
   componentDidMount() {
@@ -11,6 +10,7 @@ class App extends Component {
     });
   }
   connectSpotify() {
+    const OAuth = window.OAuth;
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
     OAuth.redirect('spotify', window.location.href + 'listen');
   }
