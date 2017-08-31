@@ -3,8 +3,8 @@ import './App.css';
 import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
-import ss from 'string-similarity'
-import classnames from 'classnames'
+import ss from 'string-similarity';
+import classnames from 'classnames';
 
 const OAuth = window.OAuth;
 const url = 'https://api.spotify.com/v1/';
@@ -29,27 +29,25 @@ class Listen extends Component {
     });
   };
 
-  getCurrentSongAndDisplay = ()=>{
+  getCurrentSongAndDisplay = () => {
     this.getCurrentSong().then(res => {
-      const spotifySong = res.data.item
-      if(spotifySong.duration_ms) {
-        setTimeout( this.getCurrentSongAndDisplay, 5000)
-
+      const spotifySong = res.data.item;
+      if (spotifySong.duration_ms) {
+        setTimeout(this.getCurrentSongAndDisplay, 5000);
       }
-      const artistPlaying = spotifySong.artists[0].name
+      const artistPlaying = spotifySong.artists[0].name;
 
-      const newState = {...this.state}
-      this.state.artistsConcerts.forEach((artist, i)=>{
-        if(ss.compareTwoStrings(artist.artistName, artistPlaying)> .5) {
-          newState.artistsConcerts[i].currentlyPlaying = true
+      const newState = {...this.state};
+      this.state.artistsConcerts.forEach((artist, i) => {
+        if (ss.compareTwoStrings(artist.artistName, artistPlaying) > 0.5) {
+          newState.artistsConcerts[i].currentlyPlaying = true;
         } else {
-          newState.artistsConcerts[i].currentlyPlaying = null
+          newState.artistsConcerts[i].currentlyPlaying = null;
         }
-      })
-      this.setState(newState)
-
+      });
+      this.setState(newState);
     });
-  }
+  };
 
   componentDidMount() {
     if (_.isNil(OAuth)) {
@@ -77,9 +75,9 @@ class Listen extends Component {
             let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
             const iframe = document.querySelector('.player');
             // observeArtistPlaying();
-            this.getCurrentSongAndDisplay()
+            this.getCurrentSongAndDisplay();
             iframe.src = uri;
-            artistsPlayingConcerts().then(artists => {
+            artistsPlayingConcertsTomorrow().then(artists => {
               this.setState({artistsConcerts: artists.slice(0, 30)});
             });
             return;
@@ -92,13 +90,12 @@ class Listen extends Component {
           }).then(r => {
             const playListId = r.data.id;
             let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
-            artistsPlayingConcerts().then(artists => {
+            artistsPlayingConcertsTomorrow().then(artists => {
               // console.log('ARTISTS', artists);
 
               this.setState({artistsConcerts: artists.slice(0, 30)});
               Promise.all(
                 artists.map(({artistName, concert}) => {
-
                   const url = `https://api.spotify.com/v1/search?q=${artistName}&type=artist`;
                   return spotify.get(url).done(res => {
                     if (res.artists.items.length <= 0) {
@@ -168,7 +165,7 @@ class Listen extends Component {
         characterData: true,
       });
     }
-    function artistsPlayingConcerts() {
+    function artistsPlayingConcertsTomorrow() {
       const sK = 'https://api.songkick.com/api/3.0/';
       const sKSearch = sK + 'search/locations.json';
       return axios({
@@ -191,7 +188,12 @@ class Listen extends Component {
           concerts.forEach(concert => {
             concert.performance.forEach(artist => {
               const artistName = artist.artist.displayName;
-              artists.push({artistName, concert});
+              let tomorrow = moment(new Date()).add(1, 'days').format('l');
+              console.log(moment(concert.start.date), tomorrow)
+              if (moment(concert.start.date).format('l') === tomorrow) {
+                artists.push({artistName, concert});
+                console.log(concert);
+              }
             });
           });
           return artists;
@@ -214,11 +216,15 @@ class Listen extends Component {
 
           <table>
             <tbody>
-              {this.state.artistsConcerts.map(({artistName, concert, currentlyPlaying}, i) => {
+              {this.state.artistsConcerts.map(({
+                artistName,
+                concert,
+                currentlyPlaying,
+              }, i) => {
                 const concertClasses = classnames({
                   concert: true,
-                  currentlyPlaying
-                })
+                  currentlyPlaying,
+                });
                 return (
                   <tr
                     key={i}
