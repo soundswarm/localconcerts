@@ -29,6 +29,28 @@ class Listen extends Component {
     });
   };
 
+  getCurrentSongAndDisplay = ()=>{
+    this.getCurrentSong().then(res => {
+      const spotifySong = res.data.item
+      if(spotifySong.duration_ms) {
+        setTimeout( this.getCurrentSongAndDisplay, 5000)
+
+      }
+      const artistPlaying = spotifySong.artists[0].name
+
+      const newState = {...this.state}
+      this.state.artistsConcerts.forEach((artist, i)=>{
+        if(ss.compareTwoStrings(artist.artistName, artistPlaying)> .5) {
+          newState.artistsConcerts[i].currentlyPlaying = true
+        } else {
+          newState.artistsConcerts[i].currentlyPlaying = null
+        }
+      })
+      this.setState(newState)
+
+    });
+  }
+
   componentDidMount() {
     if (_.isNil(OAuth)) {
       this.context.router.push('/');
@@ -55,21 +77,7 @@ class Listen extends Component {
             let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
             const iframe = document.querySelector('.player');
             // observeArtistPlaying();
-            this.getCurrentSong().then(res => {
-              const spotifySong = res.data.item
-              const artistPlaying = spotifySong.artists[0].name
-
-              const newState = {...this.state}
-              this.state.artistsConcerts.forEach((artist, i)=>{
-                if(ss.compareTwoStrings(artist.artistName, artistPlaying)> .5) {
-                  console.log('CONDITION PASSED', artist.artistName)
-                  newState.artistsConcerts[i].currentlyPlaying = true
-                } else {
-                  newState.artistsConcerts[i].currentlyPlaying = null
-                }
-              })
-              this.setState(newState)
-            });
+            this.getCurrentSongAndDisplay()
             iframe.src = uri;
             artistsPlayingConcerts().then(artists => {
               this.setState({artistsConcerts: artists.slice(0, 30)});
@@ -193,8 +201,6 @@ class Listen extends Component {
   }
 
   render() {
-    console.log('this.state', this.state)
-
     return (
       <div className="app">
         <div className="title">
