@@ -65,8 +65,8 @@ class Listen extends Component {
       spotify.me().done(data => {
         this.spotifyUserId = data.id;
 
-        let playlist = new Date().toLocaleDateString();
-        this.playlist = `MC-${playlist}`;
+        let playlist = moment(new Date()).add(1, 'days').format('l');;
+        this.playlist = `LC-${playlist}`;
         this.getPlaylists().then(res => {
           const playlist = res.data.items.filter(playlist => {
             return playlist.name === this.playlist;
@@ -77,7 +77,7 @@ class Listen extends Component {
             // observeArtistPlaying();
             this.getCurrentSongAndDisplay();
             iframe.src = uri;
-            artistsPlayingConcertsTomorrow().then(artists => {
+            artistsPlayingConcerts().then(artists => {
               this.setState({artistsConcerts: artists.slice(0, 30)});
             });
             return;
@@ -90,7 +90,7 @@ class Listen extends Component {
           }).then(r => {
             const playListId = r.data.id;
             let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
-            artistsPlayingConcertsTomorrow().then(artists => {
+            artistsPlayingConcerts().then(artists => {
               // console.log('ARTISTS', artists);
 
               this.setState({artistsConcerts: artists.slice(0, 30)});
@@ -165,7 +165,7 @@ class Listen extends Component {
         characterData: true,
       });
     }
-    function artistsPlayingConcertsTomorrow() {
+    function artistsPlayingConcerts() {
       const sK = 'https://api.songkick.com/api/3.0/';
       const sKSearch = sK + 'search/locations.json';
       return axios({
