@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
 import axios from 'axios';
-import {Table} from 'react-bootstrap';
 import moment from 'moment';
 import _ from 'lodash';
 
@@ -12,12 +11,19 @@ class Listen extends Component {
     super(props);
     this.state = {artistsConcerts: []};
     this.store = {};
+    this.ax = null;
   }
   getPlaylists = () => {
     return this.ax({
       method: 'get',
       url: `${url}users/${this.spotifyUserId}/playlists`,
       limit: 50,
+    });
+  };
+  getCurrentSong = () => {
+    return this.ax({
+      method: 'get',
+      url: `${url}me/player/currently-playing`,
     });
   };
 
@@ -46,6 +52,11 @@ class Listen extends Component {
           if (playlist) {
             let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
             const iframe = document.querySelector('.player');
+            // observeArtistPlaying();
+            this.getCurrentSong().then(res => {
+              const spotifySong = res.data.item
+              console.log('spotifySong', spotifySong);
+            });
             iframe.src = uri;
             artistsPlayingConcerts().then(artists => {
               this.setState({artistsConcerts: artists.slice(0, 30)});
@@ -66,12 +77,25 @@ class Listen extends Component {
               this.setState({artistsConcerts: artists.slice(0, 30)});
               Promise.all(
                 artists.map(({artistName, concert}) => {
+                  console.log('asdfs')
+
                   const url = `https://api.spotify.com/v1/search?q=${artistName}&type=artist`;
                   return spotify.get(url).done(res => {
                     if (res.artists.items.length <= 0) {
                       return '';
                     }
                     const artistId = res.artists.items[0].id;
+
+                    const newState = {...this.state}
+                    this.state.artistsConcerts.forEach((artist, i)=>{
+                      console.log('ARTIST.ARTISTNAME === ARTISTNAME', artist.artistName === artistName)
+                      if(artist.artistName === artistName) {
+                        console.log('CONDITION PASSED')
+                        newState.artistsConcerts[i].spotifyArtistId = artistId
+                      }
+                    })
+                    this.setState(newState)
+
                     return this.ax({
                       url: `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,
                       method: 'get',
@@ -97,6 +121,7 @@ class Listen extends Component {
                 }),
               ).then(() => {
                 const iframe = document.querySelector('.player');
+
                 observeArtistPlaying();
                 iframe.src = uri;
                 console.log('URI', uri);
@@ -109,16 +134,18 @@ class Listen extends Component {
     function observeArtistPlaying() {
       MutationObserver = window.MutationObserver ||
         window.WebKitMutationObserver;
-
+      console.log('fire');
       var observer = new MutationObserver(function(mutations, observer) {
         // fired when a mutation occurs
         // console.log('utantts', mutations, observer);
 
         const player = document.querySelector('.player');
+        console.log('PLAYER', player);
         var innerDoc = player.contentDocument || player.contentWindow.document;
         // console.log('INNERDOC', innerDoc);
         // get artist playing
-        const artists = innerDoc.querySelector('body');
+        console.log('innerDoc', innerDoc);
+        // const artists = innerDoc.querySelector('body');
         // console.log('ARTISTS', artists);
       });
 
@@ -165,6 +192,7 @@ class Listen extends Component {
   }
 
   render() {
+    console.log('this.state', this.state)
     return (
       <div className="app">
         <div className="title">
