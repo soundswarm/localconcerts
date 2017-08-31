@@ -30,6 +30,10 @@ body {
   align-items: center;
 }
 
+.currentlyPlaying {
+  color: green;
+}
+
 .concerts table {
   margin: auto;
   margin-bottom: 30px;

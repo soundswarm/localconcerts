@@ -3,6 +3,8 @@ import './App.css';
 import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
+import ss from 'string-similarity'
+import classnames from 'classnames'
 
 const OAuth = window.OAuth;
 const url = 'https://api.spotify.com/v1/';
@@ -55,7 +57,18 @@ class Listen extends Component {
             // observeArtistPlaying();
             this.getCurrentSong().then(res => {
               const spotifySong = res.data.item
-              console.log('spotifySong', spotifySong);
+              const artistPlaying = spotifySong.artists[0].name
+
+              const newState = {...this.state}
+              this.state.artistsConcerts.forEach((artist, i)=>{
+                if(ss.compareTwoStrings(artist.artistName, artistPlaying)> .5) {
+                  console.log('CONDITION PASSED', artist.artistName)
+                  newState.artistsConcerts[i].currentlyPlaying = true
+                } else {
+                  newState.artistsConcerts[i].currentlyPlaying = null
+                }
+              })
+              this.setState(newState)
             });
             iframe.src = uri;
             artistsPlayingConcerts().then(artists => {
@@ -77,7 +90,6 @@ class Listen extends Component {
               this.setState({artistsConcerts: artists.slice(0, 30)});
               Promise.all(
                 artists.map(({artistName, concert}) => {
-                  console.log('asdfs')
 
                   const url = `https://api.spotify.com/v1/search?q=${artistName}&type=artist`;
                   return spotify.get(url).done(res => {
@@ -85,17 +97,6 @@ class Listen extends Component {
                       return '';
                     }
                     const artistId = res.artists.items[0].id;
-
-                    const newState = {...this.state}
-                    this.state.artistsConcerts.forEach((artist, i)=>{
-                      console.log('ARTIST.ARTISTNAME === ARTISTNAME', artist.artistName === artistName)
-                      if(artist.artistName === artistName) {
-                        console.log('CONDITION PASSED')
-                        newState.artistsConcerts[i].spotifyArtistId = artistId
-                      }
-                    })
-                    this.setState(newState)
-
                     return this.ax({
                       url: `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,
                       method: 'get',
@@ -193,6 +194,7 @@ class Listen extends Component {
 
   render() {
     console.log('this.state', this.state)
+
     return (
       <div className="app">
         <div className="title">
@@ -206,11 +208,15 @@ class Listen extends Component {
 
           <table>
             <tbody>
-              {this.state.artistsConcerts.map(({artistName, concert}, i) => {
+              {this.state.artistsConcerts.map(({artistName, concert, currentlyPlaying}, i) => {
+                const concertClasses = classnames({
+                  concert: true,
+                  currentlyPlaying
+                })
                 return (
                   <tr
                     key={i}
-                    className="concert"
+                    className={concertClasses}
                     onClick={() => window.open(concert.uri, '_blank')}
                   >
                     <td> {artistName} </td>
