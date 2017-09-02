@@ -92,7 +92,6 @@ class Listen extends Component {
             const playListId = r.data.id;
             let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
             artistsPlayingConcerts().then(artists => {
-              // console.log('ARTISTS', artists);
 
               this.setState({artistsConcerts: artists.slice(0, 30)});
               Promise.all(
@@ -117,7 +116,6 @@ class Listen extends Component {
                           topTwoTracksUris.push(topTracksUris[i]);
                         }
                       }
-                      // console.log('topTwoTracksUris', topTwoTracksUris);
                       return this.ax({
                         method: 'post',
                         url: `https://api.spotify.com/v1/users/${this.spotifyUserId}/playlists/${playListId}/tracks`,
@@ -131,7 +129,6 @@ class Listen extends Component {
 
                 observeArtistPlaying();
                 iframe.src = uri;
-                console.log('URI', uri);
               });
             });
           });
@@ -141,19 +138,13 @@ class Listen extends Component {
     function observeArtistPlaying() {
       MutationObserver = window.MutationObserver ||
         window.WebKitMutationObserver;
-      console.log('fire');
       var observer = new MutationObserver(function(mutations, observer) {
         // fired when a mutation occurs
-        // console.log('utantts', mutations, observer);
 
         const player = document.querySelector('.player');
-        console.log('PLAYER', player);
         var innerDoc = player.contentDocument || player.contentWindow.document;
-        // console.log('INNERDOC', innerDoc);
         // get artist playing
-        console.log('innerDoc', innerDoc);
         // const artists = innerDoc.querySelector('body');
-        // console.log('ARTISTS', artists);
       });
 
       // define what element should be observed by the observer
@@ -190,10 +181,8 @@ class Listen extends Component {
             concert.performance.forEach(artist => {
               const artistName = artist.artist.displayName;
               let tomorrow = moment(new Date()).add(1, 'days').format('l');
-              console.log(moment(concert.start.date), tomorrow);
               if (moment(concert.start.date).format('l') === tomorrow) {
                 artists.push({artistName, concert});
-                console.log(concert);
               }
             });
           });
