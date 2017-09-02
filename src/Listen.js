@@ -51,7 +51,8 @@ class Listen extends Component {
 
   componentDidMount() {
     if (_.isNil(OAuth)) {
-      this.context.router.push('/');
+      this.props.history.push('/')
+      return;
     }
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
 
@@ -65,7 +66,7 @@ class Listen extends Component {
       spotify.me().done(data => {
         this.spotifyUserId = data.id;
 
-        let playlist = moment(new Date()).add(1, 'days').format('l');;
+        let playlist = moment(new Date()).add(1, 'days').format('l');
         this.playlist = `LC-${playlist}`;
         this.getPlaylists().then(res => {
           const playlist = res.data.items.filter(playlist => {
@@ -189,7 +190,7 @@ class Listen extends Component {
             concert.performance.forEach(artist => {
               const artistName = artist.artist.displayName;
               let tomorrow = moment(new Date()).add(1, 'days').format('l');
-              console.log(moment(concert.start.date), tomorrow)
+              console.log(moment(concert.start.date), tomorrow);
               if (moment(concert.start.date).format('l') === tomorrow) {
                 artists.push({artistName, concert});
                 console.log(concert);
@@ -259,7 +260,4 @@ class Listen extends Component {
   }
 }
 
-Listen.contextTypes = {
-  router: React.PropTypes.object,
-};
 export default Listen;
