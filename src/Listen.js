@@ -14,6 +14,7 @@ class Listen extends Component {
     this.state = {artistsConcerts: []};
     this.store = {};
     this.ax = null;
+    this.concertDate = null;
   }
   getPlaylists = () => {
     return this.ax({
@@ -32,6 +33,7 @@ class Listen extends Component {
   getCurrentSongAndDisplay = () => {
     this.getCurrentSong().then(res => {
       const spotifySong = res.data.item;
+      console.log('SPOTIFYSONG', spotifySong)
       if (spotifySong.duration_ms) {
         setTimeout(this.getCurrentSongAndDisplay, 5000);
       }
@@ -51,12 +53,16 @@ class Listen extends Component {
 
   componentDidMount() {
     if (_.isNil(OAuth)) {
-      this.props.history.push('/')
+      this.props.history.push('/');
       return;
     }
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
-
-    OAuth.callback('spotify', {cache: true}).done(spotify => {
+    const oauthCallback = OAuth.callback('spotify', {cache: true})
+    if(_.isNil(oauthCallback)) {
+      this.props.history.push('/');
+      return;
+    }
+    oauthCallback.done(spotify => {
       this.accessToken = spotify.access_token;
 
       this.ax = axios.create({
@@ -79,7 +85,10 @@ class Listen extends Component {
             this.getCurrentSongAndDisplay();
             iframe.src = uri;
             artistsPlayingConcerts().then(artists => {
-              this.setState({artistsConcerts: artists.slice(0, 30)});
+              const artistsConcerts = artists.slice(0, 40);
+              this.setState({artistsConcerts});
+              console.log('ARTISTSCONCERTS', artistsConcerts)
+              this.setState({concertDate: artistsConcerts[0].concert.start.date});
             });
             return;
           }
@@ -92,7 +101,6 @@ class Listen extends Component {
             const playListId = r.data.id;
             let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
             artistsPlayingConcerts().then(artists => {
-
               this.setState({artistsConcerts: artists.slice(0, 30)});
               Promise.all(
                 artists.map(({artistName, concert}) => {
@@ -126,8 +134,9 @@ class Listen extends Component {
                 }),
               ).then(() => {
                 const iframe = document.querySelector('.player');
+                this.getCurrentSongAndDisplay();
 
-                observeArtistPlaying();
+                // observeArtistPlaying();
                 iframe.src = uri;
               });
             });
@@ -200,6 +209,11 @@ class Listen extends Component {
           <div>
             CONCERTS
           </div>
+          <div>
+            {this.state.concertDate
+              ? moment(this.state.concertDate).format('ddd MMM D')
+              : null}
+          </div>
         </div>
 
         <div className="concerts">
@@ -222,9 +236,6 @@ class Listen extends Component {
                     onClick={() => window.open(concert.uri, '_blank')}
                   >
                     <td> {artistName} </td>
-                    <td>
-                      {moment(concert.start.date).format('MMM D')}
-                    </td>
                     <td>{concert.venue.displayName}</td>
 
                   </tr>
