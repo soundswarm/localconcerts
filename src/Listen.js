@@ -12,10 +12,15 @@ const url = 'https://api.spotify.com/v1/';
 class Listen extends Component {
   constructor(props) {
     super(props);
-    this.state = {artistsConcerts: [], currentlyPlaying: {}};
+    this.state = {
+      artistsConcerts: [],
+      currentlyPlaying: {},
+      artistsConcertsSet: {},
+      iframeSrc: '',
+    };
     this.ax = null;
     this.concertDate = null;
-    this.q = [];
+    this.current = {};
   }
   getPlaylists = () => {
     return this.ax({
@@ -34,7 +39,6 @@ class Listen extends Component {
   getCurrentSongAndDisplay = () => {
     this.getCurrentSong().then(res => {
       const spotifySong = res.data.item;
-      console.log('SPOTIFYSONG', spotifySong);
       if (spotifySong.duration_ms) {
         setTimeout(this.getCurrentSongAndDisplay, 10000);
       }
@@ -49,9 +53,7 @@ class Listen extends Component {
           newState.artistsConcerts[i].currentlyPlaying = null;
         }
       });
-      console.log();
       this.setState(newState);
-      console.log('NEWSTATE', newState);
     });
   };
 
@@ -87,11 +89,10 @@ class Listen extends Component {
             const iframe = document.querySelector('.player');
             // observeArtistPlaying();
             this.getCurrentSongAndDisplay();
-            iframe.src = uri;
+            this.setState({iframeSrc: uri});
             artistsPlayingConcerts().then(artists => {
               const artistsConcerts = artists.slice(0, 40);
               this.setState({artistsConcerts});
-              console.log('ARTISTSCONCERTS', artistsConcerts);
               this.setState({
                 concertDate: artistsConcerts[0].concert.start.date,
               });
@@ -143,7 +144,7 @@ class Listen extends Component {
                 this.getCurrentSongAndDisplay();
 
                 // observeArtistPlaying();
-                iframe.src = uri;
+                this.setState({iframeSrc: uri});
               });
             });
           });
@@ -208,7 +209,19 @@ class Listen extends Component {
   }
 
   render() {
-    console.log('this.state', this.state);
+    const getNum = concert => {
+      console.log(
+        concert.venue.displayName,
+        this.current[concert.venue.displayName],
+      );
+      if (this.current[concert.venue.displayName]) {
+        this.current[concert.venue.displayName] = 1;
+        return 1;
+      }
+      this.current[concert.venue.displayName] = 2;
+      return 2;
+    };
+    console.log('this.current', this.current);
     return (
       <div className="app">
         <div className="title">
@@ -236,6 +249,8 @@ class Listen extends Component {
                   concert: true,
                   currentlyPlaying,
                 });
+                // console.log('GETNUM(CONCERT)', getNum(concert));
+
                 return (
                   <tr
                     key={i}
@@ -243,8 +258,9 @@ class Listen extends Component {
                     onClick={() => window.open(concert.uri, '_blank')}
                   >
                     <td> {artistName} </td>
-                    <td>{concert.venue.displayName}</td>
-
+                    {getNum(concert) === 1
+                      ? <td>{concert.venue.displayName}</td>
+                      : <td>{concert.venue.displayName}</td>}
                   </tr>
                 );
               })}
@@ -252,16 +268,10 @@ class Listen extends Component {
           </table>
         </div>
 
-        <CurrentlyPlaying {...this.state.currentlyPlaying} />
-        <div className="embed-container">
-          <iframe
-            title="spotifyplayer"
-            className="player"
-            src=""
-            frameBorder="0"
-            allowTransparency="true"
-          />
-        </div>
+        <CurrentlyPlaying
+          iframeSrc={this.state.iframeSrc}
+          {...this.state.currentlyPlaying}
+        />
 
       </div>
     );
