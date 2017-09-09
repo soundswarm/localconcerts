@@ -5,16 +5,17 @@ import moment from 'moment';
 import _ from 'lodash';
 import ss from 'string-similarity';
 import classnames from 'classnames';
+import CurrentlyPlaying from './CurrentlyPlaying';
 
 const OAuth = window.OAuth;
 const url = 'https://api.spotify.com/v1/';
 class Listen extends Component {
   constructor(props) {
     super(props);
-    this.state = {artistsConcerts: []};
-    this.store = {};
+    this.state = {artistsConcerts: [], currentlyPlaying: {}};
     this.ax = null;
     this.concertDate = null;
+    this.q = [];
   }
   getPlaylists = () => {
     return this.ax({
@@ -33,9 +34,9 @@ class Listen extends Component {
   getCurrentSongAndDisplay = () => {
     this.getCurrentSong().then(res => {
       const spotifySong = res.data.item;
-      console.log('SPOTIFYSONG', spotifySong)
+      console.log('SPOTIFYSONG', spotifySong);
       if (spotifySong.duration_ms) {
-        setTimeout(this.getCurrentSongAndDisplay, 5000);
+        setTimeout(this.getCurrentSongAndDisplay, 10000);
       }
       const artistPlaying = spotifySong.artists[0].name;
 
@@ -43,11 +44,14 @@ class Listen extends Component {
       this.state.artistsConcerts.forEach((artist, i) => {
         if (ss.compareTwoStrings(artist.artistName, artistPlaying) > 0.5) {
           newState.artistsConcerts[i].currentlyPlaying = true;
+          newState.currentlyPlaying = newState.artistsConcerts[i];
         } else {
           newState.artistsConcerts[i].currentlyPlaying = null;
         }
       });
+      console.log();
       this.setState(newState);
+      console.log('NEWSTATE', newState);
     });
   };
 
@@ -57,8 +61,8 @@ class Listen extends Component {
       return;
     }
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
-    const oauthCallback = OAuth.callback('spotify', {cache: true})
-    if(_.isNil(oauthCallback)) {
+    const oauthCallback = OAuth.callback('spotify', {cache: true});
+    if (_.isNil(oauthCallback)) {
       this.props.history.push('/');
       return;
     }
@@ -87,8 +91,10 @@ class Listen extends Component {
             artistsPlayingConcerts().then(artists => {
               const artistsConcerts = artists.slice(0, 40);
               this.setState({artistsConcerts});
-              console.log('ARTISTSCONCERTS', artistsConcerts)
-              this.setState({concertDate: artistsConcerts[0].concert.start.date});
+              console.log('ARTISTSCONCERTS', artistsConcerts);
+              this.setState({
+                concertDate: artistsConcerts[0].concert.start.date,
+              });
             });
             return;
           }
@@ -202,6 +208,7 @@ class Listen extends Component {
   }
 
   render() {
+    console.log('this.state', this.state);
     return (
       <div className="app">
         <div className="title">
@@ -245,6 +252,7 @@ class Listen extends Component {
           </table>
         </div>
 
+        <CurrentlyPlaying {...this.state.currentlyPlaying} />
         <div className="embed-container">
           <iframe
             title="spotifyplayer"
