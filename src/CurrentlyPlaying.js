@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-console.log('STYLED', styled);
 
 const Container = styled.div`
   max-width: 600px;
@@ -8,7 +7,10 @@ const Container = styled.div`
 `;
 const Current = styled.div`
   background-color: #282828;
-  text-align: left;hover {
+  text-align: left;
+  margin-left: 20px;
+  margin-right: 20px;
+  &:hover {
       color: red;
       cursor: pointer;
   }

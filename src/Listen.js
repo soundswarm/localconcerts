@@ -16,6 +16,7 @@ class Listen extends Component {
     this.ax = null;
     this.concertDate = null;
     this.q = [];
+    this.iframeSrc = '';
   }
   getPlaylists = () => {
     return this.ax({
@@ -86,15 +87,16 @@ class Listen extends Component {
             let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
             const iframe = document.querySelector('.player');
             // observeArtistPlaying();
+            this.setState({iframeSrc: uri});
             this.getCurrentSongAndDisplay();
-            iframe.src = uri;
+            // iframe.src = uri;
             artistsPlayingConcerts().then(artists => {
               const artistsConcerts = artists.slice(0, 40);
               this.setState({artistsConcerts});
               console.log('ARTISTSCONCERTS', artistsConcerts);
-              // this.setState({
-              //   concertDate: artistsConcerts[0].concert.start.date,
-              // });
+              this.setState({
+                concertDate: artistsConcerts[0].concert.start.date,
+              });
             });
             return;
           }
@@ -142,8 +144,8 @@ class Listen extends Component {
                 const iframe = document.querySelector('.player');
                 this.getCurrentSongAndDisplay();
 
-                // observeArtistPlaying();
                 iframe.src = uri;
+                this.setState({iframeSrc: uri});
               });
             });
           });
@@ -252,16 +254,10 @@ class Listen extends Component {
           </table>
         </div>
 
-        <CurrentlyPlaying {...this.state.currentlyPlaying} />
-        <div className="embed-container">
-          <iframe
-            title="spotifyplayer"
-            className="player"
-            src=""
-            frameBorder="0"
-            allowTransparency="true"
-          />
-        </div>
+        <CurrentlyPlaying
+          iframeSrc={this.state.iframeSrc}
+          {...this.state.currentlyPlaying}
+        />
 
       </div>
     );
