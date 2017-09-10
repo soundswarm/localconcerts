@@ -25,23 +25,27 @@ const Right = styled.span`
   margin-right: 10px;
 `;
 const currentlyPlaying = ({concert, iframeSrc}) => {
-  return concert
-    ? <Container>
-        <Current onClick={() => window.open(concert.uri, '_blank')}>
-          <Left>{`Venue:  ${concert.venue.displayName}`}</Left>
-          <Right>{`Buy Tickets`}</Right>
-        </Current>
-        <div className="embed-container">
-          <iframe
-            title="spotifyplayer"
-            className="player"
-            src={iframeSrc}
-            frameBorder="0"
-            allowTransparency="true"
-          />
-        </div>
-      </Container>
-    : null;
+  console.log('CONCERT, IFRAMESRC', concert, iframeSrc);
+  return (
+    <Container>
+      {concert
+        ? <Current onClick={() => window.open(concert.uri, '_blank')}>
+            <Left>{`Venue:  ${concert.venue.displayName}`}</Left>
+            <Right>{`Buy Tickets`}</Right>
+          </Current>
+        : null}
+
+      <div className="embed-container">
+        <iframe
+          title="spotifyplayer"
+          className="player"
+          src={iframeSrc}
+          frameBorder="0"
+          allowTransparency="true"
+        />
+      </div>
+    </Container>
+  );
 };
 
 export default currentlyPlaying;
