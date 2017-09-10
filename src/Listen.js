@@ -141,7 +141,6 @@ class Listen extends Component {
                   });
                 }),
               ).then(() => {
-                const iframe = document.querySelector('.player');
                 this.getCurrentSongAndDisplay();
                 this.setState({iframeSrc: uri});
               });
