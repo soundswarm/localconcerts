@@ -17,7 +17,6 @@ const Current = styled.div`
 `;
 
 const currentlyPlaying = ({concert, iframeSrc}) => {
-  console.log('IFRAMESRC', iframeSrc);
   return concert
     ? <Container>
         <Current onClick={() => window.open(concert.uri, '_blank')}>
