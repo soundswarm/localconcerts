@@ -224,7 +224,10 @@ class Listen extends Component {
               : null}
           </div>
         </div>
-
+        <CurrentlyPlaying
+          iframeSrc={this.state.iframeSrc}
+          {...this.state.currentlyPlaying}
+        />
         <div className="concerts">
 
           <table>
@@ -253,12 +256,6 @@ class Listen extends Component {
             </tbody>
           </table>
         </div>
-
-        <CurrentlyPlaying
-          iframeSrc={this.state.iframeSrc}
-          {...this.state.currentlyPlaying}
-        />
-
       </div>
     );
   }
