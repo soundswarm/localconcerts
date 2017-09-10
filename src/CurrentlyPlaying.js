@@ -16,16 +16,20 @@ const Current = styled.div`
 `;
 
 const Left = styled.span`
-  margin-left: 94px;
-  margin-right: 20px;
+  margin-left: 93px;
+  font-size: 13px;
 `;
 
+const Right = styled.span`
+  float: right;
+  margin-right: 10px;
+`;
 const currentlyPlaying = ({concert, iframeSrc}) => {
   return concert
     ? <Container>
         <Current onClick={() => window.open(concert.uri, '_blank')}>
           <Left>{`Venue:  ${concert.venue.displayName}`}</Left>
-          <span>{`Buy Tickets`}</span>
+          <Right>{`Buy Tickets`}</Right>
         </Current>
         <div className="embed-container">
           <iframe

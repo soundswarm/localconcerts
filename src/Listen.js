@@ -37,7 +37,7 @@ class Listen extends Component {
       const spotifySong = res.data.item;
       console.log('SPOTIFYSONG', spotifySong);
       if (spotifySong && spotifySong.duration_ms) {
-        setTimeout(this.getCurrentSongAndDisplay, 8000);
+        setTimeout(this.getCurrentSongAndDisplay, 6000);
       }
       const artistPlaying = spotifySong.artists[0].name;
 
@@ -143,8 +143,6 @@ class Listen extends Component {
               ).then(() => {
                 const iframe = document.querySelector('.player');
                 this.getCurrentSongAndDisplay();
-
-                iframe.src = uri;
                 this.setState({iframeSrc: uri});
               });
             });
