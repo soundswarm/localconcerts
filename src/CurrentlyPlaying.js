@@ -18,12 +18,16 @@ const Current = styled.div`
 const Left = styled.span`
   margin-left: 93px;
   font-size: 13px;
+  @media screen and (max-width: 720px) {
+    margin-left: 5px;
+  }
 `;
 
 const Right = styled.span`
   float: right;
   margin-right: 10px;
 `;
+
 const currentlyPlaying = ({concert, iframeSrc}) => {
   console.log('CONCERT, IFRAMESRC', concert, iframeSrc);
   return (

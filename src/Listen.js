@@ -6,8 +6,10 @@ import _ from 'lodash';
 import ss from 'string-similarity';
 import classnames from 'classnames';
 import CurrentlyPlaying from './CurrentlyPlaying';
+import ip from 'ip';
 
 const OAuth = window.OAuth;
+const userip = window.userip;
 const url = 'https://api.spotify.com/v1/';
 class Listen extends Component {
   constructor(props) {
@@ -35,7 +37,7 @@ class Listen extends Component {
   getCurrentSongAndDisplay = () => {
     this.getCurrentSong().then(res => {
       const spotifySong = res.data.item;
-      console.log('SPOTIFYSONG', spotifySong);
+
       if (spotifySong && spotifySong.duration_ms) {
         setTimeout(this.getCurrentSongAndDisplay, 6000);
       }
@@ -50,9 +52,7 @@ class Listen extends Component {
           newState.artistsConcerts[i].currentlyPlaying = null;
         }
       });
-      console.log();
       this.setState(newState);
-      console.log('NEWSTATE', newState);
     });
   };
 
@@ -93,7 +93,6 @@ class Listen extends Component {
             artistsPlayingConcerts().then(artists => {
               const artistsConcerts = artists.slice(0, 40);
               this.setState({artistsConcerts});
-              console.log('ARTISTSCONCERTS', artistsConcerts);
               this.setState({
                 concertDate: artistsConcerts[0].concert.start.date,
               });
@@ -174,10 +173,11 @@ class Listen extends Component {
     function artistsPlayingConcerts() {
       const sK = 'https://api.songkick.com/api/3.0/';
       const sKSearch = sK + 'search/locations.json';
+      console.log('ip()', userip);
       return axios({
         url: sKSearch,
         method: 'GET',
-        params: {apikey: 'Z7OwHVINevycipT7', location: 'clientip'},
+        params: {apikey: 'Z7OwHVINevycipT7', location: `ip:${userip}`},
       }).then(function(res) {
         const locationId = res.data.resultsPage.results.location[
           0
@@ -207,7 +207,6 @@ class Listen extends Component {
   }
 
   render() {
-    console.log('this.state', this.state);
     return (
       <div className="app">
         <div className="title">
