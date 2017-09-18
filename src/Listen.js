@@ -6,7 +6,6 @@ import _ from 'lodash';
 import ss from 'string-similarity';
 import classnames from 'classnames';
 import CurrentlyPlaying from './CurrentlyPlaying';
-import ip from 'ip';
 
 const OAuth = window.OAuth;
 const userip = window.userip;
@@ -40,19 +39,19 @@ class Listen extends Component {
 
       if (spotifySong && spotifySong.duration_ms) {
         setTimeout(this.getCurrentSongAndDisplay, 6000);
-      }
-      const artistPlaying = spotifySong.artists[0].name;
+        const artistPlaying = spotifySong.artists[0].name;
 
-      const newState = {...this.state};
-      this.state.artistsConcerts.forEach((artist, i) => {
-        if (ss.compareTwoStrings(artist.artistName, artistPlaying) > 0.5) {
-          newState.artistsConcerts[i].currentlyPlaying = true;
-          newState.currentlyPlaying = newState.artistsConcerts[i];
-        } else {
-          newState.artistsConcerts[i].currentlyPlaying = null;
-        }
-      });
-      this.setState(newState);
+        const newState = {...this.state};
+        this.state.artistsConcerts.forEach((artist, i) => {
+          if (ss.compareTwoStrings(artist.artistName, artistPlaying) > 0.5) {
+            newState.artistsConcerts[i].currentlyPlaying = true;
+            newState.currentlyPlaying = newState.artistsConcerts[i];
+          } else {
+            newState.artistsConcerts[i].currentlyPlaying = null;
+          }
+        });
+        this.setState(newState);
+      }
     });
   };
 
@@ -207,6 +206,7 @@ class Listen extends Component {
   }
 
   render() {
+    const displayedVenues = {};
     return (
       <div className="app">
         <div className="title">
@@ -237,6 +237,9 @@ class Listen extends Component {
                   concert: true,
                   currentlyPlaying,
                 });
+                const existing = {...displayedVenues};
+                const venueName = concert.venue.displayName;
+                displayedVenues[venueName] = true;
                 return (
                   <tr
                     key={i}
@@ -244,7 +247,7 @@ class Listen extends Component {
                     onClick={() => window.open(concert.uri, '_blank')}
                   >
                     <td> {artistName} </td>
-                    <td>{concert.venue.displayName}</td>
+                    {!existing[venueName] ? <td>{venueName}</td> : null}
 
                   </tr>
                 );
