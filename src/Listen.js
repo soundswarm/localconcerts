@@ -36,6 +36,7 @@ class Listen extends Component {
   getCurrentSongAndDisplay = () => {
     this.getCurrentSong().then(res => {
       const spotifySong = res.data.item;
+      console.log('SPOTIFYSONG', spotifySong);
 
       if (spotifySong && spotifySong.duration_ms) {
         setTimeout(this.getCurrentSongAndDisplay, 6000);
@@ -43,13 +44,22 @@ class Listen extends Component {
 
         const newState = {...this.state};
         this.state.artistsConcerts.forEach((artist, i) => {
+          console.log(
+            '(artist.artistName, artistPlaying',
+            artist.artistName,
+            artistPlaying,
+          );
           if (ss.compareTwoStrings(artist.artistName, artistPlaying) > 0.5) {
+            console.log('trueee');
             newState.artistsConcerts[i].currentlyPlaying = true;
             newState.currentlyPlaying = newState.artistsConcerts[i];
           } else {
+            console.log('falllse');
+
             newState.artistsConcerts[i].currentlyPlaying = null;
           }
         });
+        // console.log('NEWSTATE', newState);
         this.setState(newState);
       }
     });
