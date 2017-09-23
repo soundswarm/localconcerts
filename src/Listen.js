@@ -36,7 +36,6 @@ class Listen extends Component {
   getCurrentSongAndDisplay = () => {
     this.getCurrentSong().then(res => {
       const spotifySong = res.data.item;
-      console.log('SPOTIFYSONG', spotifySong);
 
       if (spotifySong && spotifySong.duration_ms) {
         setTimeout(this.getCurrentSongAndDisplay, 6000);
@@ -44,22 +43,13 @@ class Listen extends Component {
 
         const newState = {...this.state};
         this.state.artistsConcerts.forEach((artist, i) => {
-          console.log(
-            '(artist.artistName, artistPlaying',
-            artist.artistName,
-            artistPlaying,
-          );
           if (ss.compareTwoStrings(artist.artistName, artistPlaying) > 0.5) {
-            console.log('trueee');
             newState.artistsConcerts[i].currentlyPlaying = true;
             newState.currentlyPlaying = newState.artistsConcerts[i];
           } else {
-            console.log('falllse');
-
             newState.artistsConcerts[i].currentlyPlaying = null;
           }
         });
-        // console.log('NEWSTATE', newState);
         this.setState(newState);
       }
     });
@@ -100,7 +90,6 @@ class Listen extends Component {
             this.getCurrentSongAndDisplay();
             // iframe.src = uri;
             artistsPlayingConcerts().then(artists => {
-              console.log('ARTISTS', artists);
               const artistsConcerts = artists.slice(0, 40);
               this.setState({artistsConcerts});
               this.setState({
@@ -181,56 +170,32 @@ class Listen extends Component {
       });
     }
     function artistsPlayingConcerts() {
-      const sK = 'https://api.songkick.com/api/3.0/';
-      const sKSearch = sK + 'search/locations.json';
-      console.log('ip()', userip);
+      const searchEvents = 'http://api.songkick.com/api/3.0/events.json';
+      let tomorrow = moment(new Date()).add(1, 'days');
       return axios({
-        url: sKSearch,
+        url: searchEvents,
         method: 'GET',
-        params: {apikey: 'Z7OwHVINevycipT7', location: `ip:${userip}`},
+        params: {
+          apikey: 'Z7OwHVINevycipT7',
+          location: `ip:${userip}`,
+          min_date: tomorrow.format('YYYY-MM-DD'),
+          max_date: tomorrow.format('YYYY-MM-DD'),
+        },
       }).then(function(res) {
-        const locationId = res.data.resultsPage.results.location[
-          0
-        ].metroArea.id;
-        const getConcerts = sK + `metro_areas/${locationId}/calendar.json?`;
-        // http://api.songkick.com/api/3.0/events.json?apikey={your_api_key}
-        const searchEvents = 'http://api.songkick.com/api/3.0/events.json';
-        let tomorrow = moment(new Date()).add(1, 'days');
-        console.log('TOMORROW', tomorrow);
-        return axios({
-          url: searchEvents,
-          method: 'GET',
-          params: {
-            apikey: 'Z7OwHVINevycipT7',
-            location: `ip:${userip}`,
-            min_date: tomorrow.format('YYYY-MM-DD'),
-            max_date: tomorrow.format('YYYY-MM-DD'),
-          },
-        }).then(function(res) {
-          const concerts = res.data.resultsPage.results.event;
-          console.log('CONCERTS', concerts);
-          const artists = [];
+        const concerts = res.data.resultsPage.results.event;
+        const artists = [];
 
-          concerts.forEach(concert => {
-            concert.performance.forEach(artist => {
-              // console.log('ARTIST', artist);
-              const artistName = artist.artist.displayName;
-
-              console.log(
-                'tomorrow',
-                tomorrow,
-                moment(concert.start.date).format('l'),
-              );
-              console.log('ARTISTNAME, CONCERT', artistName, concert);
-              if (
-                moment(concert.start.date).format('l') === tomorrow.format('l')
-              ) {
-                artists.push({artistName, concert});
-              }
-            });
+        concerts.forEach(concert => {
+          concert.performance.forEach(artist => {
+            const artistName = artist.artist.displayName;
+            if (
+              moment(concert.start.date).format('l') === tomorrow.format('l')
+            ) {
+              artists.push({artistName, concert});
+            }
           });
-          return artists;
         });
+        return artists;
       });
     }
   }
