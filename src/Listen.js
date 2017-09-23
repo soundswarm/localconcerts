@@ -100,6 +100,7 @@ class Listen extends Component {
             this.getCurrentSongAndDisplay();
             // iframe.src = uri;
             artistsPlayingConcerts().then(artists => {
+              console.log('ARTISTS', artists);
               const artistsConcerts = artists.slice(0, 40);
               this.setState({artistsConcerts});
               this.setState({
@@ -192,19 +193,38 @@ class Listen extends Component {
           0
         ].metroArea.id;
         const getConcerts = sK + `metro_areas/${locationId}/calendar.json?`;
+        // http://api.songkick.com/api/3.0/events.json?apikey={your_api_key}
+        const searchEvents = 'http://api.songkick.com/api/3.0/events.json';
+        let tomorrow = moment(new Date()).add(1, 'days');
+        console.log('TOMORROW', tomorrow);
         return axios({
-          url: getConcerts,
+          url: searchEvents,
           method: 'GET',
-          params: {apikey: 'Z7OwHVINevycipT7'},
+          params: {
+            apikey: 'Z7OwHVINevycipT7',
+            location: `ip:${userip}`,
+            min_date: tomorrow.format('YYYY-MM-DD'),
+            max_date: tomorrow.format('YYYY-MM-DD'),
+          },
         }).then(function(res) {
           const concerts = res.data.resultsPage.results.event;
+          console.log('CONCERTS', concerts);
           const artists = [];
 
           concerts.forEach(concert => {
             concert.performance.forEach(artist => {
+              // console.log('ARTIST', artist);
               const artistName = artist.artist.displayName;
-              let tomorrow = moment(new Date()).add(1, 'days').format('l');
-              if (moment(concert.start.date).format('l') === tomorrow) {
+
+              console.log(
+                'tomorrow',
+                tomorrow,
+                moment(concert.start.date).format('l'),
+              );
+              console.log('ARTISTNAME, CONCERT', artistName, concert);
+              if (
+                moment(concert.start.date).format('l') === tomorrow.format('l')
+              ) {
                 artists.push({artistName, concert});
               }
             });
