@@ -29,7 +29,6 @@ const Right = styled.span`
 `;
 
 const currentlyPlaying = ({concert, iframeSrc}) => {
-  console.log('CONCERT, IFRAMESRC', concert, iframeSrc);
   return (
     <Container>
       {concert

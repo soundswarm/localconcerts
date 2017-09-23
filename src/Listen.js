@@ -6,6 +6,7 @@ import _ from 'lodash';
 import ss from 'string-similarity';
 import classnames from 'classnames';
 import CurrentlyPlaying from './CurrentlyPlaying';
+import Concerts from './Concerts';
 
 const OAuth = window.OAuth;
 const userip = window.userip;
@@ -219,37 +220,11 @@ class Listen extends Component {
           iframeSrc={this.state.iframeSrc}
           {...this.state.currentlyPlaying}
         />
-        <div className="concerts">
-
-          <table>
-            <tbody>
-              {this.state.artistsConcerts.map(({
-                artistName,
-                concert,
-                currentlyPlaying,
-              }, i) => {
-                const concertClasses = classnames({
-                  concert: true,
-                  currentlyPlaying,
-                });
-                const existing = {...displayedVenues};
-                const venueName = concert.venue.displayName;
-                displayedVenues[venueName] = true;
-                return (
-                  <tr
-                    key={i}
-                    className={concertClasses}
-                    onClick={() => window.open(concert.uri, '_blank')}
-                  >
-                    <td> {artistName} </td>
-                    {!existing[venueName] ? <td>{venueName}</td> : null}
-
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <Concerts
+          displayedVenues={displayedVenues}
+          currentlyPlaying={this.state.currentlyPlaying}
+          artistsConcerts={this.state.artistsConcerts}
+        />
       </div>
     );
   }

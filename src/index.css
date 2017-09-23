@@ -20,31 +20,11 @@ body {
   /*flex-direction: column;*/
   /*align-items: center;*/
 }
-.concert:hover {
-    color: red;
-    cursor: pointer;
-}
-.concerts {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
+
+
 
 .currentlyPlaying {
   color: #1DB954;
-}
-
-.concerts table {
-  margin: auto;
-  margin-bottom: 30px;
-
-}
-.concerts .table-responsive td {
-  border: none;
-}
-
-.concerts a:hover {
-  color: red;
 }
 .title {
   margin-bottom: 30px;
