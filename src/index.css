@@ -21,7 +21,10 @@ body {
   /*align-items: center;*/
 }
 
-
+.gif {
+  display: block;
+  margin: auto;
+}
 
 .currentlyPlaying {
   color: #1DB954;

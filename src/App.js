@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import './App.css';
 import {Button} from 'react-bootstrap';
+import tenor from './tenor.gif';
 
 class App extends Component {
   componentDidMount() {
@@ -27,6 +28,7 @@ class App extends Component {
           Connect to Spotify to listen to upcoming concerts in your area
         </div>
         <Button onClick={this.connectSpotify}>Connect to Spotify</Button>
+        <img className="gif" src={tenor} alt="fireSpot" />
       </div>
     );
   }

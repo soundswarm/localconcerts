@@ -16,7 +16,6 @@ const ConcertStyle = styled.div`
   &:hover {
       color: red;
       cursor: pointer;
-
   }
 `;
 const Artists = styled.span`
@@ -37,7 +36,6 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
 
   return (
     <Concerts>
-
       {Object.keys(concertsMap).map((concert, i) => {
         const concertClasses = classnames({
           concert: true,
@@ -66,7 +64,6 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
                 <Artist> {artist.displayName}</Artist>
               ))}
             </Artists>
-
           </ConcertStyle>
         );
       })}
