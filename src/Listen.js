@@ -14,7 +14,7 @@ const url = 'https://api.spotify.com/v1/';
 class Listen extends Component {
   constructor(props) {
     super(props);
-    this.state = {artistsConcerts: [], currentlyPlaying: {}};
+    this.state = {artistsConcerts: [], currentlyPlaying: {}, locationName: ''};
     this.ax = null;
     this.concertDate = null;
     this.q = [];
@@ -92,6 +92,7 @@ class Listen extends Component {
           const locationName = loc.data.resultsPage.results.location[
             0
           ].city.displayName;
+          this.setState({locationName});
           this.playlist = locationName + ` - ${playlist}`;
           // this.playlist = `concerts.dance - ${playlist}`;
           this.getPlaylists().then(res => {
@@ -230,6 +231,9 @@ class Listen extends Component {
             {this.state.concertDate
               ? moment(this.state.concertDate).format('ddd MMM D')
               : null}
+          </div>
+          <div>
+            {this.state.locationName}
           </div>
         </div>
         <CurrentlyPlaying

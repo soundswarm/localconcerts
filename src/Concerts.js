@@ -8,11 +8,11 @@ const Concerts = styled.div`
   margin: auto;
   display: flex;
   flex-direction: column;
-  align-items: left;
   text-align: left
 `;
 const ConcertStyle = styled.div`
   margin-bottom: 20px;
+  text-align: center;
   &:hover {
       color: red;
       cursor: pointer;
