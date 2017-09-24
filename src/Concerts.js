@@ -19,18 +19,12 @@ const ConcertStyle = styled.div`
 
   }
 `;
-
-const Artist = styled.div`
-  margin-left: 10px;
-`;
-const ConcertName = styled.div`
-  font-size: 15px;
+const Artists = styled.span`
 `;
 
 const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
   const concertsMap = {};
   artistsConcerts.forEach(concert => {
-    console.log('CONCERT', concert);
     if (concertsMap[concert.concert.venue.displayName]) {
       concertsMap[concert.concert.venue.displayName].artists.push(concert);
     } else {
@@ -40,30 +34,6 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
       };
     }
   });
-  // {artistsConcerts.map(({
-  //   artistName,
-  //   concert,
-  //   currentlyPlaying,
-  // }, i) => {
-  //   const concertClasses = classnames({
-  //     concert: true,
-  //     currentlyPlaying,
-  //   });
-  //   const existing = {...displayedVenues};
-  //   const venueName = concert.venue.displayName;
-  //   displayedVenues[venueName] = true;
-  //   return (
-  //     <div
-  //       key={i}
-  //       className={concertClasses}
-  //       onClick={() => window.open(concert.uri, '_blank')}
-  //     >
-  //       <div> {artistName} </div>
-  //       {!existing[venueName] ? <td>{venueName}</td> : null}
-  //
-  //     </div>
-  //   );
-  // })}
 
   return (
     <Concerts>
@@ -73,7 +43,17 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
           concert: true,
           currentlyPlaying,
         });
-        console.log(concertsMap[concert]);
+        const CurrentlyPlaying = styled.div`
+         ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
+        `;
+        const Artist = styled.div`
+          margin-left: 10px;
+          ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
+        `;
+        const ConcertName = styled.div`
+          font-size: 15px;
+          ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
+        `;
         return (
           <ConcertStyle
             key={i}
@@ -81,9 +61,11 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
               window.open(concertsMap[concert].concert.uri, '_blank')}
           >
             <ConcertName>{concert}</ConcertName>
-            {concertsMap[concert].concert.performance.map(artist => (
-              <Artist> {artist.displayName}</Artist>
-            ))}
+            <Artists>
+              {concertsMap[concert].concert.performance.map(artist => (
+                <Artist> {artist.displayName}</Artist>
+              ))}
+            </Artists>
 
           </ConcertStyle>
         );

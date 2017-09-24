@@ -33,7 +33,17 @@ class Listen extends Component {
       url: `${url}me/player/currently-playing`,
     });
   };
-
+  getLocation = () => {
+    const locationUrl = 'https://api.songkick.com/api/3.0/search/locations.json';
+    return axios({
+      url: locationUrl,
+      method: 'GET',
+      params: {
+        apikey: 'Z7OwHVINevycipT7',
+        location: `ip:${userip}`,
+      },
+    });
+  };
   getCurrentSongAndDisplay = () => {
     this.getCurrentSong().then(res => {
       const spotifySong = res.data.item;
@@ -77,71 +87,77 @@ class Listen extends Component {
       spotify.me().done(data => {
         this.spotifyUserId = data.id;
 
-        let playlist = moment(new Date()).add(1, 'days').format('l');
-        this.playlist = `LC-${playlist}`;
-        this.getPlaylists().then(res => {
-          const playlist = res.data.items.filter(playlist => {
-            return playlist.name === this.playlist;
-          })[0];
-          if (playlist) {
-            let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
-            const iframe = document.querySelector('.player');
-            // observeArtistPlaying();
-            this.setState({iframeSrc: uri});
-            this.getCurrentSongAndDisplay();
-            // iframe.src = uri;
-            artistsPlayingConcerts().then(artists => {
-              const artistsConcerts = artists.slice(0, 40);
-              this.setState({artistsConcerts});
-              this.setState({
-                concertDate: artistsConcerts[0].concert.start.date,
+        let playlist = moment(new Date()).add(1, 'days').format('MMM DD');
+        this.getLocation().then(loc => {
+          const locationName = loc.data.resultsPage.results.location[
+            0
+          ].city.displayName;
+          this.playlist = locationName + ` - ${playlist}`;
+          // this.playlist = `concerts.dance - ${playlist}`;
+          this.getPlaylists().then(res => {
+            const playlist = res.data.items.filter(playlist => {
+              return playlist.name === this.playlist;
+            })[0];
+            if (playlist) {
+              let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
+              const iframe = document.querySelector('.player');
+              // observeArtistPlaying();
+              this.setState({iframeSrc: uri});
+              this.getCurrentSongAndDisplay();
+              // iframe.src = uri;
+              artistsPlayingConcerts().then(artists => {
+                const artistsConcerts = artists.slice(0, 40);
+                this.setState({artistsConcerts});
+                this.setState({
+                  concertDate: artistsConcerts[0].concert.start.date,
+                });
               });
-            });
-            return;
-          }
+              return;
+            }
 
-          this.ax({
-            method: 'post',
-            url: `${url}users/${this.spotifyUserId}/playlists`,
-            data: {name: this.playlist},
-          }).then(r => {
-            const playListId = r.data.id;
-            let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
-            artistsPlayingConcerts().then(artists => {
-              this.setState({artistsConcerts: artists.slice(0, 30)});
-              Promise.all(
-                artists.map(({artistName, concert}) => {
-                  const url = `https://api.spotify.com/v1/search?q=${artistName}&type=artist`;
-                  return spotify.get(url).done(res => {
-                    if (res.artists.items.length <= 0) {
-                      return '';
-                    }
-                    const artistId = res.artists.items[0].id;
-                    return this.ax({
-                      url: `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,
-                      method: 'get',
-                      params: {country: 'US'},
-                    }).then(res => {
-                      const topTracksUris = res.data.tracks.map(
-                        track => track.uri,
-                      );
-                      const topTwoTracksUris = [];
-                      for (let i = 0; i < 1; i++) {
-                        if (topTracksUris[i]) {
-                          topTwoTracksUris.push(topTracksUris[i]);
-                        }
+            this.ax({
+              method: 'post',
+              url: `${url}users/${this.spotifyUserId}/playlists`,
+              data: {name: this.playlist},
+            }).then(r => {
+              const playListId = r.data.id;
+              let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
+              artistsPlayingConcerts().then(artists => {
+                this.setState({artistsConcerts: artists.slice(0, 30)});
+                Promise.all(
+                  artists.map(({artistName, concert}) => {
+                    const url = `https://api.spotify.com/v1/search?q=${artistName}&type=artist`;
+                    return spotify.get(url).done(res => {
+                      if (res.artists.items.length <= 0) {
+                        return '';
                       }
+                      const artistId = res.artists.items[0].id;
                       return this.ax({
-                        method: 'post',
-                        url: `https://api.spotify.com/v1/users/${this.spotifyUserId}/playlists/${playListId}/tracks`,
-                        data: {uris: topTwoTracksUris},
+                        url: `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,
+                        method: 'get',
+                        params: {country: 'US'},
+                      }).then(res => {
+                        const topTracksUris = res.data.tracks.map(
+                          track => track.uri,
+                        );
+                        const topTwoTracksUris = [];
+                        for (let i = 0; i < 1; i++) {
+                          if (topTracksUris[i]) {
+                            topTwoTracksUris.push(topTracksUris[i]);
+                          }
+                        }
+                        return this.ax({
+                          method: 'post',
+                          url: `https://api.spotify.com/v1/users/${this.spotifyUserId}/playlists/${playListId}/tracks`,
+                          data: {uris: topTwoTracksUris},
+                        });
                       });
                     });
-                  });
-                }),
-              ).then(() => {
-                this.getCurrentSongAndDisplay();
-                this.setState({iframeSrc: uri});
+                  }),
+                ).then(() => {
+                  this.getCurrentSongAndDisplay();
+                  this.setState({iframeSrc: uri});
+                });
               });
             });
           });
@@ -171,7 +187,7 @@ class Listen extends Component {
       });
     }
     function artistsPlayingConcerts() {
-      const searchEvents = 'http://api.songkick.com/api/3.0/events.json';
+      const searchEvents = 'https://api.songkick.com/api/3.0/events.json';
       let tomorrow = moment(new Date()).add(1, 'days');
       return axios({
         url: searchEvents,
