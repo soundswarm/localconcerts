@@ -7,6 +7,7 @@ import ss from 'string-similarity';
 import classnames from 'classnames';
 import CurrentlyPlaying from './CurrentlyPlaying';
 import Concerts from './Concerts';
+import tenor from './tenor.gif';
 
 const OAuth = window.OAuth;
 const userip = window.userip;
@@ -14,7 +15,12 @@ const url = 'https://api.spotify.com/v1/';
 class Listen extends Component {
   constructor(props) {
     super(props);
-    this.state = {artistsConcerts: [], currentlyPlaying: {}, locationName: ''};
+    this.state = {
+      artistsConcerts: [],
+      currentlyPlaying: {},
+      locationName: '',
+      loading: false,
+    };
     this.ax = null;
     this.concertDate = null;
     this.q = [];
@@ -67,6 +73,7 @@ class Listen extends Component {
   };
 
   componentDidMount() {
+    this.setState({loading: true});
     if (_.isNil(OAuth)) {
       this.props.history.push('/');
       return;
@@ -103,7 +110,8 @@ class Listen extends Component {
               let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
               const iframe = document.querySelector('.player');
               // observeArtistPlaying();
-              this.setState({iframeSrc: uri});
+
+              this.setState({iframeSrc: uri, loading: false});
               this.getCurrentSongAndDisplay();
               // iframe.src = uri;
               artistsPlayingConcerts().then(artists => {
@@ -157,7 +165,7 @@ class Listen extends Component {
                   }),
                 ).then(() => {
                   this.getCurrentSongAndDisplay();
-                  this.setState({iframeSrc: uri});
+                  this.setState({iframeSrc: uri, loading: false});
                 });
               });
             });
@@ -236,6 +244,11 @@ class Listen extends Component {
             {this.state.locationName}
           </div>
         </div>
+        {this.state.loading
+          ? <div className="gif">
+              <img src={tenor} alt="fireSpot" />
+            </div>
+          : null}
         <CurrentlyPlaying
           iframeSrc={this.state.iframeSrc}
           {...this.state.currentlyPlaying}
