@@ -109,11 +109,8 @@ class Listen extends Component {
             if (playlist) {
               let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
               const iframe = document.querySelector('.player');
-              // observeArtistPlaying();
-
               this.setState({iframeSrc: uri, loading: false});
               this.getCurrentSongAndDisplay();
-              // iframe.src = uri;
               artistsPlayingConcerts().then(artists => {
                 const artistsConcerts = artists.slice(0, 40);
                 this.setState({artistsConcerts});
@@ -127,7 +124,10 @@ class Listen extends Component {
             this.ax({
               method: 'post',
               url: `${url}users/${this.spotifyUserId}/playlists`,
-              data: {name: this.playlist},
+              data: {
+                name: this.playlist,
+                description: 'A playlist by http://concerts.dance',
+              },
             }).then(r => {
               const playListId = r.data.id;
               let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
