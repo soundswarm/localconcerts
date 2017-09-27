@@ -8,8 +8,10 @@
     "react": "^15.6.1",
     "react-bootstrap": "^0.31.2",
     "react-dom": "^15.6.1",
+    "react-primitives": "^0.4.3",
     "react-router": "^4.1.2",
-    "string-similarity": "^1.2.0"
+    "string-similarity": "^1.2.0",
+    "styled-components": "^2.1.2"
   },
   "devDependencies": {
     "react-scripts": "1.0.11"

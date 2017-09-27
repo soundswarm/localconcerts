@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import './App.css';
 import {Button} from 'react-bootstrap';
+import {View, Text} from 'react-primitives';
+import styled from 'styled-components/primitives';
 
 class App extends Component {
   componentDidMount() {
@@ -16,18 +18,22 @@ class App extends Component {
   }
   render() {
     return (
-      <div className="app">
-        <div className="title">
-          LOCAL
-          <div>
-            CONCERTS
-          </div>
-        </div>
-        <div className="subtitle">
-          Connect to Spotify to listen to upcoming concerts in your area
-        </div>
-        <Button onClick={this.connectSpotify}>Connect to Spotify</Button>
-      </div>
+      <View className="app">
+        <View className="title">
+          <Text>LOCAL</Text>
+          <View>
+            <Text>CONCERTS</Text>
+          </View>
+        </View>
+        <View className="subtitle">
+          <Text>
+            Connect to Spotify to listen to upcoming concerts in your area
+          </Text>
+        </View>
+        <Button onClick={this.connectSpotify}>
+          <Text>Connect to Spotify</Text>
+        </Button>
+      </View>
     );
   }
 }
