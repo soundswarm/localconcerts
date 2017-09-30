@@ -4,10 +4,11 @@ import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
 import ss from 'string-similarity';
+import classnames from 'classnames';
 import CurrentlyPlaying from './CurrentlyPlaying';
 import Concerts from './Concerts';
 import tenor from './tenor.gif';
-const analytics = window.analytics
+
 const OAuth = window.OAuth;
 const userip = window.userip;
 const url = 'https://api.spotify.com/v1/';
@@ -25,7 +26,6 @@ class Listen extends Component {
     this.q = [];
     this.iframeSrc = '';
   }
-
   getPlaylists = () => {
     return this.ax({
       method: 'get',
@@ -92,35 +92,8 @@ class Listen extends Component {
       });
 
       spotify.me().done(data => {
-        console.log('DATA', data)
-
         this.spotifyUserId = data.id;
-//         {
-//   "id": "symbioticshift",
-//   "location": "US",
-//   "name": null,
-//   "email": "seantconnor@gmail.com",
-//   "alias": "symbioticshift",
-//   "raw": {
-//     "country": "US",
-//     "display_name": null,
-//     "email": "seantconnor@gmail.com",
-//     "external_urls": {
-//       "spotify": "https://open.spotify.com/user/symbioticshift"
-//     },
-//     "followers": {
-//       "href": null,
-//       "total": 9
-//     },
-//     "href": "https://api.spotify.com/v1/users/symbioticshift",
-//     "id": "symbioticshift",
-//     "images": [],
-//     "product": "premium",
-//     "type": "user",
-//     "uri": "spotify:user:symbioticshift"
-//   }
-// }
-        analytics.identify(this.spotifyUserId, {email: data.email})
+
         let playlist = moment(new Date()).add(1, 'days').format('MMM DD');
         this.getLocation().then(loc => {
           const locationName = loc.data.resultsPage.results.location[
@@ -135,6 +108,7 @@ class Listen extends Component {
             })[0];
             if (playlist) {
               let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
+              const iframe = document.querySelector('.player');
               this.setState({iframeSrc: uri, loading: false});
               this.getCurrentSongAndDisplay();
               artistsPlayingConcerts().then(artists => {
@@ -199,28 +173,28 @@ class Listen extends Component {
         });
       });
     });
-    // function observeArtistPlaying() {
-    //   MutationObserver = window.MutationObserver ||
-    //     window.WebKitMutationObserver;
-    //   var observer = new MutationObserver(function(mutations, observer) {
-    //     // fired when a mutation occurs
-    //
-    //     const player = document.querySelector('.player');
-    //     var innerDoc = player.contentDocument || player.contentWindow.document;
-    //     // get artist playing
-    //     // const artists = innerDoc.querySelector('body');
-    //   });
-    //
-    //   // define what element should be observed by the observer
-    //   // and what types of mutations trigger the callback
-    //   const player = document.querySelector('iframe');
-    //   observer.observe(player, {
-    //     subtree: true,
-    //     attributes: true,
-    //     childList: true,
-    //     characterData: true,
-    //   });
-    // }
+    function observeArtistPlaying() {
+      MutationObserver = window.MutationObserver ||
+        window.WebKitMutationObserver;
+      var observer = new MutationObserver(function(mutations, observer) {
+        // fired when a mutation occurs
+
+        const player = document.querySelector('.player');
+        var innerDoc = player.contentDocument || player.contentWindow.document;
+        // get artist playing
+        // const artists = innerDoc.querySelector('body');
+      });
+
+      // define what element should be observed by the observer
+      // and what types of mutations trigger the callback
+      const player = document.querySelector('iframe');
+      observer.observe(player, {
+        subtree: true,
+        attributes: true,
+        childList: true,
+        characterData: true,
+      });
+    }
     function artistsPlayingConcerts() {
       const searchEvents = 'https://api.songkick.com/api/3.0/events.json';
       let tomorrow = moment(new Date()).add(1, 'days');
@@ -261,7 +235,7 @@ class Listen extends Component {
           <div>
             CONCERTS
           </div>
-          {this.state.concertDate ? <div className="on">on</div> : null}
+          {this.state.concertDate ? <div>on</div> : null}
           <div>
             {this.state.concertDate
               ? moment(this.state.concertDate).format('ddd MMM D')
