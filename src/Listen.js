@@ -137,16 +137,9 @@ class Listen extends Component {
                   artists.map(({artistName, concert}) => {
                     const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track`;
                     return spotify.get(url).done(res => {
-                      if (res.artists.items.length <= 0) {
-                        return '';
-                      }
-                      const artistId = res.artists.items[0].id;
-                      return this.ax({
-                        url: `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,
-                        method: 'get',
-                        params: {country: 'US'},
-                      }).then(res => {
-                        const topTracksUris = res.data.tracks.map(
+                      console.log('RES', res)
+
+                        const topTracksUris = res.tracks.items.map(
                           track => track.uri,
                         );
                         const topTwoTracksUris = [];
@@ -160,7 +153,6 @@ class Listen extends Component {
                           url: `https://api.spotify.com/v1/users/${this.spotifyUserId}/playlists/${playListId}/tracks`,
                           data: {uris: topTwoTracksUris},
                         });
-                      });
                     });
                   }),
                 ).then(() => {
