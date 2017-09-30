@@ -5,9 +5,7 @@ import App from './App';
 import Listen from './Listen';
 import registerServiceWorker from './registerServiceWorker';
 // import {Router, Route, Redirect} from 'react-router';
-import {  HashRouter,  Route,  Redirect} from 'react-router-dom';
-import createBrowserHistory from 'history/createBrowserHistory';
-const history = createBrowserHistory();
+import {  HashRouter,  Route} from 'react-router-dom';
 ReactDOM.render(
   <HashRouter>
     <div>
