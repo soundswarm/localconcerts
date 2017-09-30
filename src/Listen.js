@@ -135,7 +135,7 @@ class Listen extends Component {
                 this.setState({artistsConcerts: artists.slice(0, 30)});
                 Promise.all(
                   artists.map(({artistName, concert}) => {
-                    const url = `https://api.spotify.com/v1/search?q=${artistName}&type=artist`;
+                    const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track`;
                     return spotify.get(url).done(res => {
                       if (res.artists.items.length <= 0) {
                         return '';
