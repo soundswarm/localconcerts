@@ -49,7 +49,9 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
         `;
         const ConcertName = styled.div`
-          font-size: 15px;
+          font-size: 20px;
+          opacity: .6;
+          text-decoration: underline;
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
         `;
         return (
@@ -60,8 +62,8 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
           >
             <ConcertName>{concert}</ConcertName>
             <Artists>
-              {concertsMap[concert].concert.performance.map(artist => (
-                <Artist> {artist.displayName}</Artist>
+              {concertsMap[concert].concert.performance.map((artist, i) => (
+                <Artist key={i + 1000}> {artist.displayName}</Artist>
               ))}
             </Artists>
           </ConcertStyle>

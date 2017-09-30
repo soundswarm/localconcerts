@@ -6,7 +6,6 @@ class App extends Component {
   componentDidMount() {
     window.addEventListener('message', function(e) {
       const message = e.data;
-      console.log('MESSAGE', message);
     });
   }
   connectSpotify() {

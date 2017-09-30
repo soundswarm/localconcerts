@@ -235,7 +235,7 @@ class Listen extends Component {
           <div>
             CONCERTS
           </div>
-          {this.state.concertDate ? <div>on</div> : null}
+          {this.state.concertDate ? <div className="on">on</div> : null}
           <div>
             {this.state.concertDate
               ? moment(this.state.concertDate).format('ddd MMM D')
