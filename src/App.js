@@ -27,9 +27,21 @@ margin-bottom: 30px;
 font-size: 14px;
 `;
 
-const Button = styled.button`
+const Button = styled.Touchable({
+})
+const ButtonTxt = styled.Text`
+  color: #1DB954;
+  border-color: #1DB954;
+  border-style: solid;
+  border-width: 1px;
+  padding: 8px;
+  width: 100%;
+  max-width: 100px;
+  border-radius: 4px;
+  text-align: center;
+  margin: auto;
+`
 
-`;
 class App extends Component {
   componentDidMount() {
     window.addEventListener('message', function(e) {
@@ -57,7 +69,7 @@ class App extends Component {
           </Text>
         </View>
         <Button onClick={this.connectSpotify}>
-          <Text>Connect to Spotify</Text>
+          <ButtonTxt>Connect to Spotify</ButtonTxt>
         </Button>
       </View>
     );
