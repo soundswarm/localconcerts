@@ -214,6 +214,7 @@ class Listen extends Component {
         },
       }).then(function(res) {
         const concerts = res.data.resultsPage.results.event;
+        concerts.sort((a,b)=>b.popularity - a.popularity)
         const artists = [];
 
         concerts.forEach(concert => {
