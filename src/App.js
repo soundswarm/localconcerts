@@ -13,6 +13,8 @@ class App extends Component {
     const OAuth = window.OAuth;
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
     OAuth.redirect('spotify', window.location.href + 'listen');
+    const analytics = window.analytics;
+    analytics.track('connectToSpotify', {})
   }
   render() {
     return (

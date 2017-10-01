@@ -101,7 +101,6 @@ class Listen extends Component {
         const analytics = window.analytics;
 
         this.spotifyUserId = data.id;
-        console.log('DATA', data)
 
         analytics.identify(this.spotifyUserId, {
           ...data
@@ -121,6 +120,7 @@ class Listen extends Component {
             if (playlist) {
               let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
               this.setState({iframeSrc: uri, loading: false});
+              analytics.track('iframeLoadedFromExisting', {uri})
               this.getCurrentSongAndDisplay();
               artistsPlayingConcerts().then(artists => {
                 const artistsConcerts = artists.slice(0, 40);
@@ -171,6 +171,7 @@ class Listen extends Component {
                   }).then(() => {
                     this.getCurrentSongAndDisplay();
                     this.setState({iframeSrc: uri, loading: false});
+                    analytics.track('iframeLoadedFromNew', {uri})
                   });
                 });
             });
@@ -216,7 +217,6 @@ class Listen extends Component {
         const concerts = res.data.resultsPage.results.event;
         concerts.sort((a,b)=>b.popularity - a.popularity)
         const artists = [];
-
         concerts.forEach(concert => {
           concert.performance.forEach(artist => {
             const artistName = artist.artist.displayName;
