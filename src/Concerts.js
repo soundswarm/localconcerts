@@ -1,6 +1,4 @@
 import React from 'react';
-import classnames from 'classnames';
-import {ListGroup, ListGroupItem} from 'react-bootstrap';
 import styled from 'styled-components';
 
 const Concerts = styled.div`
@@ -37,13 +35,6 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
   return (
     <Concerts>
       {Object.keys(concertsMap).map((concert, i) => {
-        const concertClasses = classnames({
-          concert: true,
-          currentlyPlaying,
-        });
-        const CurrentlyPlaying = styled.div`
-         ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
-        `;
         const Artist = styled.div`
           margin-left: 10px;
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
