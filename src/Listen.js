@@ -9,6 +9,7 @@ import CurrentlyPlaying from './CurrentlyPlaying';
 import Concerts from './Concerts';
 import tenor from './tenor.gif';
 
+const analytics = window.analytics;
 const OAuth = window.OAuth;
 const userip = window.userip;
 const url = 'https://api.spotify.com/v1/';
@@ -50,7 +51,7 @@ class Listen extends Component {
       },
     });
   };
-  addTracksToPlaylist = ({spotifyUserId,playlistId,tracks}) => {
+  addTracksToPlaylist = ({spotifyUserId, playlistId, tracks}) => {
     return this.ax({
       method: 'post',
       url: `https://api.spotify.com/v1/users/${spotifyUserId}/playlists/${playlistId}/tracks`,
@@ -100,7 +101,14 @@ class Listen extends Component {
 
       spotify.me().done(data => {
         this.spotifyUserId = data.id;
+        analytics.identify(this.spotifyUserId);
+        console.log('ANALYTICS', analytics)
 
+        console.log('THIS.SPOTIFYUSERID', this.spotifyUserId);
+        analytics.track('Clicked CTA', {
+          location: 'header',
+          type: 'button',
+        });
         let playlist = moment(new Date()).add(1, 'days').format('MMM DD');
         this.getLocation().then(loc => {
           const locationName = loc.data.resultsPage.results.location[
@@ -136,36 +144,39 @@ class Listen extends Component {
                 description: 'A playlist by http://concerts.dance',
               },
             }).then(r => {
-              var wtf = r.data.id
+              var wtf = r.data.id;
               this.playListId = r.data.id;
               let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
-              artistsPlayingConcerts().then(artists => {
-                this.setState({artistsConcerts: artists.slice(0, 30)});
-                return Promise.all(
-                  artists.map(({artistName, concert}) => {
-                    const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
-                    return spotify.get(url).done(res => {
-                      return res.tracks.items.map(track => track.uri);
-                    });
-                  }),
-                )
-              })
-              .then(tracks => {
-                this.addTracksToPlaylist({
-                  playlistId: wtf,
-                  spotifyUserId: this.spotifyUserId,
-                  tracks: tracks.reduce((mem,track)=>{
-                    if(track.tracks.items[0]) {
-                      mem.push(track.tracks.items[0].uri)
-                    }
-                    return mem
-                  },[]),
+              artistsPlayingConcerts()
+                .then(artists => {
+                  this.setState({artistsConcerts: artists.slice(0, 30)});
+                  return Promise.all(
+                    artists.map(({artistName, concert}) => {
+                      const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
+                      return spotify.get(url).done(res => {
+                        return res.tracks.items.map(track => track.uri);
+                      });
+                    }),
+                  );
                 })
-                .then(()=>{
-                  this.getCurrentSongAndDisplay();
-                  this.setState({iframeSrc: uri, loading: false});
-                })
-              });
+                .then(tracks => {
+                  this.addTracksToPlaylist({
+                    playlistId: wtf,
+                    spotifyUserId: this.spotifyUserId,
+                    tracks: tracks.reduce(
+                      (mem, track) => {
+                        if (track.tracks.items[0]) {
+                          mem.push(track.tracks.items[0].uri);
+                        }
+                        return mem;
+                      },
+                      [],
+                    ),
+                  }).then(() => {
+                    this.getCurrentSongAndDisplay();
+                    this.setState({iframeSrc: uri, loading: false});
+                  });
+                });
             });
           });
         });
