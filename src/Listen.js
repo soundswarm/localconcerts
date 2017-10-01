@@ -50,6 +50,13 @@ class Listen extends Component {
       },
     });
   };
+  addTracksToPlaylist = ({spotifyUserId,playlistId,tracks}) => {
+    return this.ax({
+      method: 'post',
+      url: `https://api.spotify.com/v1/users/${spotifyUserId}/playlists/${playlistId}/tracks`,
+      data: {uris: tracks},
+    });
+  };
   getCurrentSongAndDisplay = () => {
     this.getCurrentSong().then(res => {
       const spotifySong = res.data.item;
@@ -129,36 +136,35 @@ class Listen extends Component {
                 description: 'A playlist by http://concerts.dance',
               },
             }).then(r => {
-              const playListId = r.data.id;
+              var wtf = r.data.id
+              this.playListId = r.data.id;
               let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
               artistsPlayingConcerts().then(artists => {
                 this.setState({artistsConcerts: artists.slice(0, 30)});
-                Promise.all(
+                return Promise.all(
                   artists.map(({artistName, concert}) => {
-                    const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track`;
+                    const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
                     return spotify.get(url).done(res => {
-                      console.log('RES', res)
-
-                        const topTracksUris = res.tracks.items.map(
-                          track => track.uri,
-                        );
-                        const topTwoTracksUris = [];
-                        for (let i = 0; i < 1; i++) {
-                          if (topTracksUris[i]) {
-                            topTwoTracksUris.push(topTracksUris[i]);
-                          }
-                        }
-                        return this.ax({
-                          method: 'post',
-                          url: `https://api.spotify.com/v1/users/${this.spotifyUserId}/playlists/${playListId}/tracks`,
-                          data: {uris: topTwoTracksUris},
-                        });
+                      return res.tracks.items.map(track => track.uri);
                     });
                   }),
-                ).then(() => {
+                )
+              })
+              .then(tracks => {
+                this.addTracksToPlaylist({
+                  playlistId: wtf,
+                  spotifyUserId: this.spotifyUserId,
+                  tracks: tracks.reduce((mem,track)=>{
+                    if(track.tracks.items[0]) {
+                      mem.push(track.tracks.items[0].uri)
+                    }
+                    return mem
+                  },[]),
+                })
+                .then(()=>{
                   this.getCurrentSongAndDisplay();
                   this.setState({iframeSrc: uri, loading: false});
-                });
+                })
               });
             });
           });
@@ -227,7 +233,7 @@ class Listen extends Component {
           <div>
             CONCERTS
           </div>
-          {this.state.concertDate ? <div>on</div> : null}
+          {this.state.concertDate ? <div className="on">on</div> : null}
           <div>
             {this.state.concertDate
               ? moment(this.state.concertDate).format('ddd MMM D')

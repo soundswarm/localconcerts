@@ -32,7 +32,10 @@ const currentlyPlaying = ({concert, iframeSrc}) => {
   return (
     <Container>
       {concert
-        ? <Current onClick={() => window.open(concert.uri, '_blank')}>
+        ? <Current
+            className="currentlyPlaying"
+            onClick={() => window.open(concert.uri, '_blank')}
+          >
             <Left>{`Venue:  ${concert.venue.displayName}`}</Left>
             <Right>{`Buy Tickets`}</Right>
           </Current>
