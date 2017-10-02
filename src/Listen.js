@@ -145,7 +145,7 @@ class Listen extends Component {
               let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
               artistsPlayingConcerts()
                 .then(artists => {
-                  this.setState({artistsConcerts: artists.slice(0, 30)});
+                  this.setState({artistsConcerts: artists.slice(0, 40)});
                   return Promise.all(
                     artists.map(({artistName, concert}) => {
                       const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
@@ -203,7 +203,7 @@ class Listen extends Component {
     // }
     function artistsPlayingConcerts() {
       const searchEvents = 'https://api.songkick.com/api/3.0/events.json';
-      let tomorrow = moment(new Date()).add(1, 'days');
+      let tomorrow = moment(new Date())//.add(1, 'days');
       return axios({
         url: searchEvents,
         method: 'GET',
@@ -212,10 +212,12 @@ class Listen extends Component {
           location: `ip:${userip}`,
           min_date: tomorrow.format('YYYY-MM-DD'),
           max_date: tomorrow.format('YYYY-MM-DD'),
+          per_page: 50
         },
       }).then(function(res) {
         const concerts = res.data.resultsPage.results.event;
         concerts.sort((a,b)=>b.popularity - a.popularity)
+        console.log('CONCERTS', concerts)
         const artists = [];
         concerts.forEach(concert => {
           concert.performance.forEach(artist => {
