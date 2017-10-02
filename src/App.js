@@ -46,13 +46,15 @@ class App extends Component {
   componentDidMount() {
     window.addEventListener('message', function(e) {
       const message = e.data;
-      console.log('MESSAGE', message);
+      console.log('message,', message)
     });
   }
   connectSpotify() {
     const OAuth = window.OAuth;
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
     OAuth.redirect('spotify', window.location.href + 'listen');
+    const analytics = window.analytics;
+    analytics.track('connectToSpotify', {})
   }
   render() {
     return (

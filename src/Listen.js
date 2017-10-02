@@ -4,7 +4,6 @@ import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
 import ss from 'string-similarity';
-import classnames from 'classnames';
 import CurrentlyPlaying from './CurrentlyPlaying';
 import Concerts from './Concerts';
 import tenor from './tenor.gif';
@@ -50,6 +49,13 @@ class Listen extends Component {
       },
     });
   };
+  addTracksToPlaylist = ({spotifyUserId, playlistId, tracks}) => {
+    return this.ax({
+      method: 'post',
+      url: `https://api.spotify.com/v1/users/${spotifyUserId}/playlists/${playlistId}/tracks`,
+      data: {uris: tracks},
+    });
+  };
   getCurrentSongAndDisplay = () => {
     this.getCurrentSong().then(res => {
       const spotifySong = res.data.item;
@@ -92,8 +98,13 @@ class Listen extends Component {
       });
 
       spotify.me().done(data => {
+        const analytics = window.analytics;
+
         this.spotifyUserId = data.id;
 
+        analytics.identify(this.spotifyUserId, {
+          ...data
+        });
         let playlist = moment(new Date()).add(1, 'days').format('MMM DD');
         this.getLocation().then(loc => {
           const locationName = loc.data.resultsPage.results.location[
@@ -108,8 +119,8 @@ class Listen extends Component {
             })[0];
             if (playlist) {
               let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
-              const iframe = document.querySelector('.player');
               this.setState({iframeSrc: uri, loading: false});
+              analytics.track('iframeLoadedFromExisting', {uri})
               this.getCurrentSongAndDisplay();
               artistsPlayingConcerts().then(artists => {
                 const artistsConcerts = artists.slice(0, 40);
@@ -129,75 +140,70 @@ class Listen extends Component {
                 description: 'A playlist by http://concerts.dance',
               },
             }).then(r => {
-              const playListId = r.data.id;
+              var wtf = r.data.id;
+              this.playListId = r.data.id;
               let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
-              artistsPlayingConcerts().then(artists => {
-                this.setState({artistsConcerts: artists.slice(0, 30)});
-                Promise.all(
-                  artists.map(({artistName, concert}) => {
-                    const url = `https://api.spotify.com/v1/search?q=${artistName}&type=artist`;
-                    return spotify.get(url).done(res => {
-                      if (res.artists.items.length <= 0) {
-                        return '';
-                      }
-                      const artistId = res.artists.items[0].id;
-                      return this.ax({
-                        url: `https://api.spotify.com/v1/artists/${artistId}/top-tracks`,
-                        method: 'get',
-                        params: {country: 'US'},
-                      }).then(res => {
-                        const topTracksUris = res.data.tracks.map(
-                          track => track.uri,
-                        );
-                        const topTwoTracksUris = [];
-                        for (let i = 0; i < 1; i++) {
-                          if (topTracksUris[i]) {
-                            topTwoTracksUris.push(topTracksUris[i]);
-                          }
-                        }
-                        return this.ax({
-                          method: 'post',
-                          url: `https://api.spotify.com/v1/users/${this.spotifyUserId}/playlists/${playListId}/tracks`,
-                          data: {uris: topTwoTracksUris},
-                        });
+              artistsPlayingConcerts()
+                .then(artists => {
+                  this.setState({artistsConcerts: artists.slice(0, 40)});
+                  return Promise.all(
+                    artists.map(({artistName, concert}) => {
+                      const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
+                      return spotify.get(url).done(res => {
+                        return res.tracks.items.map(track => track.uri);
                       });
-                    });
-                  }),
-                ).then(() => {
-                  this.getCurrentSongAndDisplay();
-                  this.setState({iframeSrc: uri, loading: false});
+                    }),
+                  );
+                })
+                .then(tracks => {
+                  this.addTracksToPlaylist({
+                    playlistId: wtf,
+                    spotifyUserId: this.spotifyUserId,
+                    tracks: tracks.reduce(
+                      (mem, track) => {
+                        if (track.tracks.items[0]) {
+                          mem.push(track.tracks.items[0].uri);
+                        }
+                        return mem;
+                      },
+                      [],
+                    ),
+                  }).then(() => {
+                    this.getCurrentSongAndDisplay();
+                    this.setState({iframeSrc: uri, loading: false});
+                    analytics.track('iframeLoadedFromNew', {uri})
+                  });
                 });
-              });
             });
           });
         });
       });
     });
-    function observeArtistPlaying() {
-      MutationObserver = window.MutationObserver ||
-        window.WebKitMutationObserver;
-      var observer = new MutationObserver(function(mutations, observer) {
-        // fired when a mutation occurs
-
-        const player = document.querySelector('.player');
-        var innerDoc = player.contentDocument || player.contentWindow.document;
-        // get artist playing
-        // const artists = innerDoc.querySelector('body');
-      });
-
-      // define what element should be observed by the observer
-      // and what types of mutations trigger the callback
-      const player = document.querySelector('iframe');
-      observer.observe(player, {
-        subtree: true,
-        attributes: true,
-        childList: true,
-        characterData: true,
-      });
-    }
+    // function observeArtistPlaying() {
+    //   MutationObserver = window.MutationObserver ||
+    //     window.WebKitMutationObserver;
+    //   var observer = new MutationObserver(function(mutations, observer) {
+    //     // fired when a mutation occurs
+    //
+    //     const player = document.querySelector('.player');
+    //     var innerDoc = player.contentDocument || player.contentWindow.document;
+    //     // get artist playing
+    //     // const artists = innerDoc.querySelector('body');
+    //   });
+    //
+    //   // define what element should be observed by the observer
+    //   // and what types of mutations trigger the callback
+    //   const player = document.querySelector('iframe');
+    //   observer.observe(player, {
+    //     subtree: true,
+    //     attributes: true,
+    //     childList: true,
+    //     characterData: true,
+    //   });
+    // }
     function artistsPlayingConcerts() {
       const searchEvents = 'https://api.songkick.com/api/3.0/events.json';
-      let tomorrow = moment(new Date()).add(1, 'days');
+      let tomorrow = moment(new Date())//.add(1, 'days');
       return axios({
         url: searchEvents,
         method: 'GET',
@@ -206,11 +212,13 @@ class Listen extends Component {
           location: `ip:${userip}`,
           min_date: tomorrow.format('YYYY-MM-DD'),
           max_date: tomorrow.format('YYYY-MM-DD'),
+          per_page: 50
         },
       }).then(function(res) {
         const concerts = res.data.resultsPage.results.event;
+        concerts.sort((a,b)=>b.popularity - a.popularity)
+        console.log('CONCERTS', concerts)
         const artists = [];
-
         concerts.forEach(concert => {
           concert.performance.forEach(artist => {
             const artistName = artist.artist.displayName;
@@ -235,7 +243,7 @@ class Listen extends Component {
           <div>
             CONCERTS
           </div>
-          {this.state.concertDate ? <div>on</div> : null}
+          {this.state.concertDate ? <div className="on">on</div> : null}
           <div>
             {this.state.concertDate
               ? moment(this.state.concertDate).format('ddd MMM D')

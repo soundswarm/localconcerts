@@ -1,6 +1,4 @@
 import React from 'react';
-import classnames from 'classnames';
-import {ListGroup, ListGroupItem} from 'react-bootstrap';
 import styled from 'styled-components';
 
 const Concerts = styled.div`
@@ -37,19 +35,14 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
   return (
     <Concerts>
       {Object.keys(concertsMap).map((concert, i) => {
-        const concertClasses = classnames({
-          concert: true,
-          currentlyPlaying,
-        });
-        const CurrentlyPlaying = styled.div`
-         ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
-        `;
         const Artist = styled.div`
           margin-left: 10px;
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
         `;
         const ConcertName = styled.div`
-          font-size: 15px;
+          font-size: 20px;
+          opacity: .6;
+          text-decoration: underline;
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
         `;
         return (
@@ -60,8 +53,8 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
           >
             <ConcertName>{concert}</ConcertName>
             <Artists>
-              {concertsMap[concert].concert.performance.map(artist => (
-                <Artist> {artist.displayName}</Artist>
+              {concertsMap[concert].concert.performance.map((artist, i) => (
+                <Artist key={i + 1000}> {artist.displayName}</Artist>
               ))}
             </Artists>
           </ConcertStyle>
