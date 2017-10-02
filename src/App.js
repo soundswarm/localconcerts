@@ -28,6 +28,9 @@ font-size: 14px;
 `;
 
 const Button = styled.Touchable({
+  display: 'flex',
+  'flex-direction': 'row',
+  'align-items': 'center'
 })
 const ButtonTxt = styled.Text`
   color: #1DB954;
@@ -39,7 +42,6 @@ const ButtonTxt = styled.Text`
   max-width: 100px;
   border-radius: 4px;
   text-align: center;
-  margin: auto;
 `
 
 class App extends Component {
