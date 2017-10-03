@@ -1,12 +1,16 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/primitives';
 
-const Container = styled.div`
+
+const Player = styled.View`
+
+`
+
+const Container = styled.View`
   max-width: 600px;
-  margin: auto;
   padding-bottom: 50px;
 `;
-const Current = styled.div`
+const Current = styled.View`
   background-color: #282828;
   text-align: left;
   &:hover {
@@ -15,7 +19,7 @@ const Current = styled.div`
   }
 `;
 
-const Left = styled.span`
+const Left = styled.View`
   margin-left: 93px;
   font-size: 13px;
   @media screen and (max-width: 720px) {
@@ -23,7 +27,7 @@ const Left = styled.span`
   }
 `;
 
-const Right = styled.span`
+const Right = styled.View`
   float: right;
   margin-right: 10px;
 `;
@@ -41,7 +45,7 @@ const currentlyPlaying = ({concert, iframeSrc}) => {
           </Current>
         : null}
 
-      <div className="embed-container">
+      <Player className="embed-container">
         <iframe
           title="spotifyplayer"
           className="player"
@@ -49,7 +53,7 @@ const currentlyPlaying = ({concert, iframeSrc}) => {
           frameBorder="0"
           allowTransparency="true"
         />
-      </div>
+      </Player>
     </Container>
   );
 };

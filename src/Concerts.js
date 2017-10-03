@@ -1,14 +1,14 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/primitives';
+import {Text} from './App'
 
-const Concerts = styled.div`
+const Concerts = styled.Text`
   max-width: 600px;
-  margin: auto;
   display: flex;
   flex-direction: column;
   text-align: left
 `;
-const ConcertStyle = styled.div`
+const ConcertStyle = styled.Text`
   margin-bottom: 20px;
   text-align: center;
   &:hover {
@@ -16,7 +16,7 @@ const ConcertStyle = styled.div`
       cursor: pointer;
   }
 `;
-const Artists = styled.span`
+const Artists = styled.Text`
 `;
 
 const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
@@ -35,14 +35,13 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
   return (
     <Concerts>
       {Object.keys(concertsMap).map((concert, i) => {
-        const Artist = styled.div`
+        const Artist = styled.Text`
           margin-left: 10px;
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
         `;
-        const ConcertName = styled.div`
+        const ConcertName = styled.Text`
           font-size: 20px;
           opacity: .6;
-          text-decoration: underline;
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
         `;
         return (
