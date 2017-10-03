@@ -145,7 +145,7 @@ class Listen extends Component {
               let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
               artistsPlayingConcerts()
                 .then(artists => {
-                  this.setState({artistsConcerts: artists.slice(0, 40)});
+                  this.setState({artistsConcerts: artists.slice(0, 50)});
                   return Promise.all(
                     artists.map(({artistName, concert}) => {
                       const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
@@ -217,7 +217,6 @@ class Listen extends Component {
       }).then(function(res) {
         const concerts = res.data.resultsPage.results.event;
         concerts.sort((a,b)=>b.popularity - a.popularity)
-        console.log('CONCERTS', concerts)
         const artists = [];
         concerts.forEach(concert => {
           concert.performance.forEach(artist => {
