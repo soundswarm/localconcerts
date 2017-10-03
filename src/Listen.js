@@ -4,13 +4,19 @@ import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
 import ss from 'string-similarity';
+import styled from 'styled-components/primitives';
 import CurrentlyPlaying from './CurrentlyPlaying';
 import Concerts from './Concerts';
 import tenor from './tenor.gif';
+import {Text, View} from './App';
 
 const OAuth = window.OAuth;
 const userip = window.userip;
 const url = 'https://api.spotify.com/v1/';
+const Image = styled.Image({})
+
+
+
 class Listen extends Component {
   constructor(props) {
     super(props);
@@ -103,7 +109,7 @@ class Listen extends Component {
         this.spotifyUserId = data.id;
 
         analytics.identify(this.spotifyUserId, {
-          ...data
+          ...data,
         });
         let playlist = moment(new Date()).add(1, 'days').format('MMM DD');
         this.getLocation().then(loc => {
@@ -120,7 +126,7 @@ class Listen extends Component {
             if (playlist) {
               let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
               this.setState({iframeSrc: uri, loading: false});
-              analytics.track('iframeLoadedFromExisting', {uri})
+              analytics.track('iframeLoadedFromExisting', {uri});
               this.getCurrentSongAndDisplay();
               artistsPlayingConcerts().then(artists => {
                 const artistsConcerts = artists.slice(0, 40);
@@ -171,7 +177,7 @@ class Listen extends Component {
                   }).then(() => {
                     this.getCurrentSongAndDisplay();
                     this.setState({iframeSrc: uri, loading: false});
-                    analytics.track('iframeLoadedFromNew', {uri})
+                    analytics.track('iframeLoadedFromNew', {uri});
                   });
                 });
             });
@@ -203,7 +209,7 @@ class Listen extends Component {
     // }
     function artistsPlayingConcerts() {
       const searchEvents = 'https://api.songkick.com/api/3.0/events.json';
-      let tomorrow = moment(new Date())//.add(1, 'days');
+      let tomorrow = moment(new Date()); //.add(1, 'days');
       return axios({
         url: searchEvents,
         method: 'GET',
@@ -212,12 +218,12 @@ class Listen extends Component {
           location: `ip:${userip}`,
           min_date: tomorrow.format('YYYY-MM-DD'),
           max_date: tomorrow.format('YYYY-MM-DD'),
-          per_page: 50
+          per_page: 50,
         },
       }).then(function(res) {
         const concerts = res.data.resultsPage.results.event;
-        concerts.sort((a,b)=>b.popularity - a.popularity)
-        console.log('CONCERTS', concerts)
+        concerts.sort((a, b) => b.popularity - a.popularity);
+        console.log('CONCERTS', concerts);
         const artists = [];
         concerts.forEach(concert => {
           concert.performance.forEach(artist => {
@@ -233,30 +239,32 @@ class Listen extends Component {
       });
     }
   }
-
   render() {
     const displayedVenues = {};
     return (
-      <div className="app">
-        <div className="title">
+      <View>
+        <Text>
           LOCAL
-          <div>
-            CONCERTS
-          </div>
-          {this.state.concertDate ? <div className="on">on</div> : null}
-          <div>
-            {this.state.concertDate
-              ? moment(this.state.concertDate).format('ddd MMM D')
-              : null}
-          </div>
-          <div>
-            {this.state.locationName}
-          </div>
-        </div>
+        </Text>
+        <Text>
+          CONCERTS
+        </Text>
+        <Text>
+          {this.state.concertDate ? <Text>on</Text> : null}
+        </Text>
+        <Text>
+          {this.state.concertDate
+            ? moment(this.state.concertDate).format('ddd MMM D')
+            : null}
+        </Text>
+        <Text>
+          {this.state.locationName}
+        </Text>
+
         {this.state.loading
-          ? <div className="gif">
-              <img src={tenor} alt="fireSpot" />
-            </div>
+          ? <View className="gif">
+              <Image src={tenor} alt="fireSpot" />
+            </View>
           : null}
         <CurrentlyPlaying
           iframeSrc={this.state.iframeSrc}
@@ -268,7 +276,7 @@ class Listen extends Component {
           currentlyPlaying={this.state.currentlyPlaying}
           artistsConcerts={this.state.artistsConcerts}
         />
-      </div>
+      </View>
     );
   }
 }

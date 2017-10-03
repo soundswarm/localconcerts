@@ -4,14 +4,14 @@ import './App.css';
 // import {Text} from 'react-primitives';
 import styled from 'styled-components/primitives';
 
-const View = styled.View`
+export const View = styled.View`
 background-color: black;
 background-size: cover;
 width: 100%;
 padding-top: 15px;
 height: 100%;`;
 
-const Text = styled.Text`
+export const Text = styled.Text`
 color: white;
 font-family: 'Montserrat';
 text-align: center;
@@ -52,6 +52,7 @@ class App extends Component {
     });
   }
   connectSpotify() {
+    console.log('asdf')
     const OAuth = window.OAuth;
     OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
     OAuth.redirect('spotify', window.location.href + 'listen');
@@ -73,7 +74,7 @@ class App extends Component {
           </Text>
         </View>
         <Button onClick={this.connectSpotify}>
-          <ButtonTxt>Connect to Spotify</ButtonTxt>
+          <ButtonTxt onClick={this.connectSpotify}>Connect to Spotify</ButtonTxt>
         </Button>
       </View>
     );
