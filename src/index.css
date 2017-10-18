@@ -3,12 +3,21 @@
  padding: 0;
  text-align: center;
 }*/
+html {
+  height: 100%;
+}
 body {
   background-color: black;
   background-size: cover;
+  height: 100%;
+}
+#root {
+  height: 100%
+}
+.mainContainer {
+  height: 100%;
 }
 .app {
-  background-color: black;
   background-size: cover;
   color: white;
   font-family: 'Montserrat',Circular,Helvetica,Arial,sans-serif;
@@ -16,9 +25,27 @@ body {
   padding-top: 15px;
   text-align: center;
   height: 100%;
-  /*display: flex;*/
-  /*flex-direction: column;*/
-  /*align-items: center;*/
+}
+.landingApp {
+  background-size: cover;
+  color: white;
+  font-family: 'Montserrat',Circular,Helvetica,Arial,sans-serif;
+  width: 100%;
+  padding-top: 15px;
+  text-align: center;
+  height: 100%;
+}
+
+.landingApp::after {
+  content: "";
+  background: url('http://3.bp.blogspot.com/-8hlNavxtVDQ/VD8c5Eqb7oI/AAAAAAAAHZI/CYhXK3VZSjk/s1600/concert-crowd.jpg');
+  opacity: 0.5;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;
 }
 .on {
   opacity: .6

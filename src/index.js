@@ -8,7 +8,7 @@ import registerServiceWorker from './registerServiceWorker';
 import {  HashRouter,  Route} from 'react-router-dom';
 ReactDOM.render(
   <HashRouter>
-    <div>
+    <div className='mainContainer'>
       <Route exact path="/" component={App} />
       <Route path="/listen" component={Listen} />
     </div>
