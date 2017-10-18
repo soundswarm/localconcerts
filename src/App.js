@@ -26,9 +26,9 @@ class App extends Component {
           </div>
         </div>
         <div className="subtitle">
-          Connect to Spotify to listen to upcoming concerts in your area
+          Discover upcoming concerts near you by artists you'll love
         </div>
-        <Button onClick={this.connectSpotify}>Connect to Spotify</Button>
+        <Button onClick={this.connectSpotify}>Connect with Spotify</Button>
       </div>
     );
   }
