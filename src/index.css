@@ -39,6 +39,7 @@ body {
 .landingApp::after {
   content: "";
   background: url('http://3.bp.blogspot.com/-8hlNavxtVDQ/VD8c5Eqb7oI/AAAAAAAAHZI/CYhXK3VZSjk/s1600/concert-crowd.jpg');
+  background-repeat: no-repeat;
   opacity: 0.4;
   top: 0;
   left: 0;
