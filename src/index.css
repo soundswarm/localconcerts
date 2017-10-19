@@ -18,6 +18,7 @@ body {
   height: 100%;
 }
 .app {
+  background-color: black;
   background-size: cover;
   color: white;
   font-family: 'Montserrat',Circular,Helvetica,Arial,sans-serif;
@@ -34,6 +35,8 @@ body {
   padding-top: 15px;
   text-align: center;
   height: 100%;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .landingApp::after {
@@ -53,11 +56,8 @@ body {
 }
 .gif {
   display: flex;
-  /*margin: auto;*/
   flex-direction: column;
   align-items: center;
-
-
 }
 .gif img {
   max-width: 200px;
@@ -67,11 +67,21 @@ body {
   color: #1DB954;
 }
 .title {
+  margin-top: 15px;
+  margin-bottom: 30px;
+  font-size: 30px;
+  font-weight: bold;
+}
+.subtitle {
+  margin-bottom: 45px;
+  font-size: 20px;
+}
+.listenTitle {
   margin-bottom: 30px;
   font-size: 18px;
   font-weight: bold;
 }
-.subtitle {
+.listenSubtitle {
   margin-bottom: 30px;
   font-size: 14px;
 }

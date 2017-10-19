@@ -19,9 +19,9 @@ class App extends Component {
     return (
       <div className="landingApp">
         <div className="title">
-          LOCAL
+          SEE
           <div>
-            CONCERTS
+            musIQ
           </div>
         </div>
         <div className="subtitle">

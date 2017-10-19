@@ -232,25 +232,25 @@ class Listen extends Component {
                   );
                 })
                 .then(tracks => {
-                  console.log('TRACKS', tracks);
-                  console.log('this.userTopArtists', this.userTopArtists);
-                  const followedArtistIds = this.userTopArtists.data.items.map(
-                    artist => {
-                      return artist.id;
-                    },
-                  );
-                  const artistsSet = new Set(followedArtistIds);
-                  const followedArtistTracks = tracks.filter(track => {
-                    console.log(
-                      'track.tracks.items[0].',
-                      track.tracks.items[0],
-                    );
-                    if (track.tracks.items[0]) {
-                      const artistId = track.tracks.items[0].artists[0].id;
-                      return artistsSet.has(artistId);
-                    }
-                  });
-                  console.log('FOLLOWEDARTISTTRACKS', followedArtistTracks);
+                  // console.log('TRACKS', tracks);
+                  // console.log('this.userTopArtists', this.userTopArtists);
+                  // const followedArtistIds = this.userTopArtists.data.items.map(
+                  //   artist => {
+                  //     return artist.id;
+                  //   },
+                  // );
+                  // const artistsSet = new Set(followedArtistIds);
+                  // const followedArtistTracks = tracks.filter(track => {
+                  //   console.log(
+                  //     'track.tracks.items[0].',
+                  //     track.tracks.items[0],
+                  //   );
+                  //   if (track.tracks.items[0]) {
+                  //     const artistId = track.tracks.items[0].artists[0].id;
+                  //     return artistsSet.has(artistId);
+                  //   }
+                  // });
+                  // console.log('FOLLOWEDARTISTTRACKS', followedArtistTracks);
                   this.addTracksToPlaylist({
                     playlistId: wtf,
                     spotifyUserId: this.spotifyUserId,
@@ -279,7 +279,7 @@ class Listen extends Component {
     const displayedVenues = {};
     return (
       <div className="app">
-        <div className="title">
+        <div className="listenTitle">
           LOCAL
           <div>
             CONCERTS
