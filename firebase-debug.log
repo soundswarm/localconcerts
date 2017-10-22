@@ -1,0 +1,16 @@
+[debug] [2017-10-22T21:59:56.654Z] ----------------------------------------------------------------------
+[debug] [2017-10-22T21:59:56.658Z] Command:       /usr/local/Cellar/node/7.5.0/bin/node /usr/local/bin/firebase deploy
+[debug] [2017-10-22T21:59:56.659Z] CLI Version:   3.10.1
+[debug] [2017-10-22T21:59:56.659Z] Platform:      darwin
+[debug] [2017-10-22T21:59:56.659Z] Node Version:  v7.5.0
+[debug] [2017-10-22T21:59:56.660Z] Time:          Sun Oct 22 2017 14:59:56 GMT-0700 (PDT)
+[debug] [2017-10-22T21:59:56.660Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2017-10-22T21:59:56.680Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2017-10-22T21:59:56.680Z] > authorizing via signed-in user
+[debug] [2017-10-22T21:59:56.682Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/spotify-c1984  
+ Sun Oct 22 2017 14:59:56 GMT-0700 (PDT)
+[debug] [2017-10-22T21:59:57.174Z] <<< HTTP RESPONSE 200
+[debug] [2017-10-22T21:59:57.176Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/spotify-c1984/tokens  
+ Sun Oct 22 2017 14:59:57 GMT-0700 (PDT)
+[debug] [2017-10-22T21:59:57.600Z] <<< HTTP RESPONSE 200
