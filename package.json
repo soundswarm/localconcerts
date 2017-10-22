@@ -2,7 +2,6 @@
   "name": "spotifyreact",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://soundswarm.github.io/localconcerts",
   "dependencies": {
     "axios": "^0.17.0",
     "gh-pages": "^1.0.0",
