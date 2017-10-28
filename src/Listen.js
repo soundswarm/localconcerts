@@ -14,6 +14,7 @@ class Listen extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      displayTopConcerts: true,
       artistsConcerts: [],
       currentlyPlaying: {},
       locationName: '',
@@ -113,24 +114,22 @@ class Listen extends Component {
       params: {limit: 50},
     });
   };
-  getUsersTopArtists = (url=`https://api.spotify.com/v1/me/top/artists`) => {
+  getUsersTopArtists = (url = `https://api.spotify.com/v1/me/top/artists`) => {
     return this.ax({
       method: 'get',
       url,
       params: {limit: 50},
     });
   };
-  getUsersAllTopArtists  = (url, artists=[])=>{
+  getUsersAllTopArtists = (url, artists = []) => {
     return this.getUsersTopArtists(url).then(topArtists => {
-
-      artists = artists.concat(topArtists.data.items)
-      if(topArtists.data.next) {
-        return this.getUsersAllTopArtists(topArtists.data.next, artists)
+      artists = artists.concat(topArtists.data.items);
+      if (topArtists.data.next) {
+        return this.getUsersAllTopArtists(topArtists.data.next, artists);
       }
-      console.log('ARTISTS', artists)
-      return artists
-    })
-  }
+      return artists;
+    });
+  };
 
   artistsPlayingConcertsTomorrow = () => {
     const tomorrow = moment(new Date()).add(1, 'days');
@@ -147,6 +146,35 @@ class Listen extends Component {
         });
       });
       return artists;
+    });
+  };
+  topArtistsConcerts = () => {
+    return this.getUsersAllTopArtists().then(topArtists => {
+      this.userTopArtists = topArtists;
+      return Promise.all(
+        topArtists.map(artist => {
+          return this.getArtistConcerts(artist.name);
+        }),
+      ).then(re => {
+        const artists = [];
+        const actualConcerts = re
+          .filter(r => r.data.resultsPage.totalEntries > 0)
+          .forEach(res => {
+            const concert = res.data.resultsPage.results.event[0];
+            concert.performance.forEach(artist => {
+              const artistName = artist.artist.displayName;
+              artists.push({artistName, concert});
+            });
+          });
+        return artists;
+      });
+    });
+  };
+  createNewPlalist = datas => {
+    return this.ax({
+      method: 'post',
+      url: `${url}users/${this.spotifyUserId}/playlists`,
+      data: {...datas},
     });
   };
   componentDidMount() {
@@ -169,29 +197,13 @@ class Listen extends Component {
       });
 
       spotify.me().done(data => {
-        console.log('DATA', data);
         const analytics = window.analytics;
 
         this.spotifyUserId = data.id;
         this.getUsersFollowedArtsists().then(followedArtists => {
-          console.log('followedArtists', followedArtists);
           this.userFollowedArtists = followedArtists;
         });
-        this.getUsersAllTopArtists().then(topArtists => {
-          console.log('ALLLLLLLLtopArtists', topArtists);
 
-          this.userTopArtists = topArtists;
-          Promise.all(topArtists.map(artist=>{
-            console.log('artist.name','Gatorators')//artist.name)
-            return this.getArtistConcerts(artist.name)
-          }))
-          .then(re=>{
-            console.log('RE', re)
-            const actual =re.filter(r=> r.data.resultsPage.totalEntries>0)
-            console.log('actual',actual)
-          })
-
-        });
         analytics.identify(this.spotifyUserId, {
           ...data,
         });
@@ -213,7 +225,7 @@ class Listen extends Component {
               analytics.track('iframeLoadedFromExisting', {uri});
               this.getCurrentSongAndDisplay();
               this.artistsPlayingConcertsTomorrow().then(artists => {
-                const artistsConcerts = artists.slice(this.maxSongsToDisplay);
+                const artistsConcerts = artists.slice(0,this.maxSongsToDisplay);
                 this.setState({artistsConcerts});
                 this.setState({
                   concertDate: artistsConcerts[0].concert.start.date,
@@ -222,21 +234,21 @@ class Listen extends Component {
               return;
             }
 
-            this.ax({
-              method: 'post',
-              url: `${url}users/${this.spotifyUserId}/playlists`,
-              data: {
-                name: this.playlist,
-                description: 'A playlist by http://concerts.dance',
-              },
+            //create new playlist
+            this.createNewPlalist({
+              name: this.playlist,
+              description: 'A playlist by seemusiq.com',
             }).then(r => {
               var wtf = r.data.id;
               this.playListId = r.data.id;
               let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
               this.artistsPlayingConcertsTomorrow()
+                // this.topArtistsConcerts()
                 .then(artists => {
-                  artists = artists.slice(this.maxSongsToDisplay);
-                  this.setState({artistsConcerts: artists.slice(0, 50)});
+                  artists = artists.slice(0, this.maxSongsToDisplay);
+                  this.setState({
+                    artistsConcerts: artists.slice(0, this.maxSongsToDisplay),
+                  });
                   return Promise.all(
                     artists.map(({artistName, concert}) => {
                       const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
@@ -247,7 +259,7 @@ class Listen extends Component {
                   );
                 })
                 .then(tracks => {
-                  // console.log('TRACKS', tracks);
+                  console.log('TRACKS', tracks);
                   // console.log('this.userTopArtists', this.userTopArtists);
                   // const followedArtistIds = this.userTopArtists.data.items.map(
                   //   artist => {
@@ -291,9 +303,8 @@ class Listen extends Component {
     });
   }
   render() {
-    const displayedVenues = {};
-    return (
-      <div className="app">
+    const TomorrowConcerts = (
+      <div>
         <div className="listenTitle">
           LOCAL
           <div>
@@ -324,6 +335,46 @@ class Listen extends Component {
           currentlyPlaying={this.state.currentlyPlaying}
           artistsConcerts={this.state.artistsConcerts}
         />
+      </div>
+    );
+    const TopConcerts = (
+      <div>
+        <div className="listenTitle">
+          LOCAL
+          <div>
+            CONCERTS
+          </div>
+          {this.state.concertDate ? <div className="on">on</div> : null}
+          <div>
+            {this.state.concertDate
+              ? moment(this.state.concertDate).format('ddd MMM D')
+              : null}
+          </div>
+          <div>
+            {this.state.locationName}
+          </div>
+        </div>
+        {this.state.loading
+          ? <div className="gif">
+              <img src={tenor} alt="fireSpot" />
+            </div>
+          : null}
+        <CurrentlyPlaying
+          iframeSrc={this.state.iframeSrc}
+          {...this.state.currentlyPlaying}
+        />
+
+        <Concerts
+          displayedVenues={displayedVenues}
+          currentlyPlaying={this.state.currentlyPlaying}
+          artistsConcerts={this.state.artistsConcerts}
+        />
+      </div>
+    );
+    const displayedVenues = {};
+    return (
+      <div className="app">
+        {TomorrowConcerts}
       </div>
     );
   }
