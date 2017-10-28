@@ -1,17 +1,15 @@
 import axios from 'axios';
 import moment from 'moment';
 
-let ax = null;
 const userip = window.userip;
+const url = 'https://api.spotify.com/v1/';
 
-
+let ax = null;
 export function initializeAxios(accessToken) {
   ax = axios.create({
     headers: {Authorization: 'Bearer ' + accessToken},
   });
 }
-
-const url = 'https://api.spotify.com/v1/';
 
 export const getPlaylists = (spotifyUserId) => {
   return ax({
@@ -20,6 +18,7 @@ export const getPlaylists = (spotifyUserId) => {
     limit: 50,
   });
 };
+
 export const getCurrentSong = () => {
   return ax({
     method: 'get',
@@ -38,6 +37,7 @@ export const getLocation = () => {
   });
 };
 export const addTracksToPlaylist = ({spotifyUserId, playlistId, tracks}) => {
+  console.log('SPOTIFYUSERID', spotifyUserId)
   return ax({
     method: 'post',
     url: `https://api.spotify.com/v1/users/${spotifyUserId}/playlists/${playlistId}/tracks`,
@@ -75,7 +75,7 @@ export const getArtistConcerts = artist_name => {
 export const createNewPlalist = (datas, spotifyUserId) => {
   return ax({
     method: 'post',
-    url: `${url}users/${{spotifyUserId}}/playlists`,
+    url: `${url}users/${spotifyUserId}/playlists`,
     data: {...datas},
   });
 };

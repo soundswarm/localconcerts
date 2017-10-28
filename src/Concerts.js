@@ -19,7 +19,7 @@ const ConcertStyle = styled.div`
 const Artists = styled.span`
 `;
 
-const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
+const Concert = ({artistsConcerts, currentlyPlaying}) => {
   const concertsMap = {};
   artistsConcerts.forEach(concert => {
     if (concertsMap[concert.concert.venue.displayName]) {
@@ -31,7 +31,7 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
       };
     }
   });
-
+  console.log('CONCERTSMAP', concertsMap)
   return (
     <Concerts>
       {Object.keys(concertsMap).map((concert, i) => {
@@ -51,7 +51,7 @@ const Concert = ({artistsConcerts, currentlyPlaying, displayedVenues}) => {
             onClick={() =>
               window.open(concertsMap[concert].concert.uri, '_blank')}
           >
-            <ConcertName>{concert}</ConcertName>
+            <ConcertName>{concert} {concertsMap[concert].concert.start.date}</ConcertName>
             <Artists>
               {concertsMap[concert].concert.performance.map((artist, i) => (
                 <Artist key={i + 1000}> {artist.displayName}</Artist>
