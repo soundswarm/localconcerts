@@ -6,9 +6,8 @@ import ss from 'string-similarity';
 import CurrentlyPlaying from './CurrentlyPlaying';
 import Concerts from './Concerts';
 import tenor from './tenor.gif';
-
+import * as actions from './actions'
 const OAuth = window.OAuth;
-const userip = window.userip;
 const url = 'https://api.spotify.com/v1/';
 class Listen extends Component {
   constructor(props) {
@@ -19,6 +18,7 @@ class Listen extends Component {
       currentlyPlaying: {},
       locationName: '',
       loading: false,
+      view: 'tomorrowConcerts'
     };
     this.ax = null;
     this.concertDate = null;
@@ -27,67 +27,9 @@ class Listen extends Component {
     this.userFollowedArtists = [];
     this.maxSongsToDisplay = 100;
   }
-  getPlaylists = () => {
-    return this.ax({
-      method: 'get',
-      url: `${url}users/${this.spotifyUserId}/playlists`,
-      limit: 50,
-    });
-  };
-  getCurrentSong = () => {
-    return this.ax({
-      method: 'get',
-      url: `${url}me/player/currently-playing`,
-    });
-  };
-  getLocation = () => {
-    const locationUrl = 'https://api.songkick.com/api/3.0/search/locations.json';
-    return axios({
-      url: locationUrl,
-      method: 'GET',
-      params: {
-        apikey: 'Z7OwHVINevycipT7',
-        location: `ip:${userip}`,
-      },
-    });
-  };
-  addTracksToPlaylist = ({spotifyUserId, playlistId, tracks}) => {
-    return this.ax({
-      method: 'post',
-      url: `https://api.spotify.com/v1/users/${spotifyUserId}/playlists/${playlistId}/tracks`,
-      data: {uris: tracks},
-    });
-  };
-  getTomorrowConcerts = () => {
-    const searchEvents = 'https://api.songkick.com/api/3.0/events.json';
-    let tomorrow = moment(new Date()).add(1, 'days');
-    return axios({
-      url: searchEvents,
-      method: 'GET',
-      params: {
-        apikey: 'Z7OwHVINevycipT7',
-        location: `ip:${userip}`,
-        min_date: tomorrow.format('YYYY-MM-DD'),
-        max_date: tomorrow.format('YYYY-MM-DD'),
-        per_page: 50,
-      },
-    });
-  };
-  getArtistConcerts = artist_name => {
-    const searchEvents = 'https://api.songkick.com/api/3.0/events.json';
-    return axios({
-      url: searchEvents,
-      method: 'GET',
-      params: {
-        apikey: 'Z7OwHVINevycipT7',
-        location: `ip:${userip}`,
-        artist_name,
-        per_page: 50,
-      },
-    });
-  };
+
   getCurrentSongAndDisplay = () => {
-    this.getCurrentSong().then(res => {
+    actions.getCurrentSong().then(res => {
       const spotifySong = res.data.item;
 
       if (spotifySong && spotifySong.duration_ms) {
@@ -107,22 +49,9 @@ class Listen extends Component {
       }
     });
   };
-  getUsersFollowedArtsists = () => {
-    return this.ax({
-      method: 'get',
-      url: `https://api.spotify.com/v1/me/following?type=artist`,
-      params: {limit: 50},
-    });
-  };
-  getUsersTopArtists = (url = `https://api.spotify.com/v1/me/top/artists`) => {
-    return this.ax({
-      method: 'get',
-      url,
-      params: {limit: 50},
-    });
-  };
+
   getUsersAllTopArtists = (url, artists = []) => {
-    return this.getUsersTopArtists(url).then(topArtists => {
+    return actions.getUsersTopArtists(url).then(topArtists => {
       artists = artists.concat(topArtists.data.items);
       if (topArtists.data.next) {
         return this.getUsersAllTopArtists(topArtists.data.next, artists);
@@ -133,7 +62,7 @@ class Listen extends Component {
 
   artistsPlayingConcertsTomorrow = () => {
     const tomorrow = moment(new Date()).add(1, 'days');
-    return this.getTomorrowConcerts().then(function(res) {
+    return actions.getTomorrowConcerts().then(function(res) {
       const concerts = res.data.resultsPage.results.event;
       concerts.sort((a, b) => b.popularity - a.popularity);
       const artists = [];
@@ -192,15 +121,13 @@ class Listen extends Component {
     oauthCallback.done(spotify => {
       this.accessToken = spotify.access_token;
 
-      this.ax = axios.create({
-        headers: {Authorization: 'Bearer ' + this.accessToken},
-      });
+      actions.initializeAxios(this.accessToken)
 
       spotify.me().done(data => {
         const analytics = window.analytics;
 
         this.spotifyUserId = data.id;
-        this.getUsersFollowedArtsists().then(followedArtists => {
+        actions.getUsersFollowedArtsists().then(followedArtists => {
           this.userFollowedArtists = followedArtists;
         });
 
@@ -208,14 +135,14 @@ class Listen extends Component {
           ...data,
         });
         let playlist = moment(new Date()).add(1, 'days').format('MMM DD');
-        this.getLocation().then(loc => {
+        actions.getLocation().then(loc => {
           const locationName = loc.data.resultsPage.results.location[
             0
           ].city.displayName;
           this.setState({locationName});
           this.playlist = locationName + ` - ${playlist}`;
           // this.playlist = `concerts.dance - ${playlist}`;
-          this.getPlaylists().then(res => {
+          actions.getPlaylists(this.spotifyUserId).then(res => {
             const playlist = res.data.items.filter(playlist => {
               return playlist.name === this.playlist;
             })[0];
@@ -235,10 +162,10 @@ class Listen extends Component {
             }
 
             //create new playlist
-            this.createNewPlalist({
+            actions.createNewPlalist({
               name: this.playlist,
               description: 'A playlist by seemusiq.com',
-            }).then(r => {
+            }, this.spotifyUserId).then(r => {
               var wtf = r.data.id;
               this.playListId = r.data.id;
               let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
