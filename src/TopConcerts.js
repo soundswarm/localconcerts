@@ -8,9 +8,9 @@ export default ({concertDate, locationName, iframeSrc, currentlyPlaying, artists
   return (
     <div>
       <div className="listenTitle">
-        LOCAL
+        CONCERTS
         <div>
-          CONCERTS
+          Recommended For You
         </div>
         {concertDate ? <div className="on">on</div> : null}
         <div>
