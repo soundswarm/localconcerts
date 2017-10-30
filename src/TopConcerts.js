@@ -1,10 +1,11 @@
 import React from 'react';
 import tenor from './tenor.gif';
 import moment from 'moment';
+import {Button} from 'react-bootstrap';
 import CurrentlyPlaying from './CurrentlyPlaying';
 import Concerts from './Concerts';
 
-export default ({concertDate, locationName, iframeSrc, currentlyPlaying, artistsConcerts, loading}) => {
+export default ({concertDate, locationName, iframeSrc, currentlyPlaying, artistsConcerts, loading, display}) => {
   return (
     <div>
       <div className="listenTitle">
@@ -27,6 +28,7 @@ export default ({concertDate, locationName, iframeSrc, currentlyPlaying, artists
             <img src={tenor} alt="fireSpot" />
           </div>
         : null}
+      <Button onClick={()=>display('tomorrowConcerts')}>Show Concerts Tomorrow</Button>
       <CurrentlyPlaying
         iframeSrc={iframeSrc}
         {...currentlyPlaying}

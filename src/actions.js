@@ -94,3 +94,19 @@ export const getUsersTopArtists = (url = `https://api.spotify.com/v1/me/top/arti
     params: {limit: 50},
   });
 };
+
+export const deletePlaylistTracks = (userId, playlistId, tracks) => {
+  console.log('TRACKS', tracks)
+  return ax({
+    method: 'delete',
+    url: `${url}users/${userId}/playlists/${playlistId}/tracks`,
+    data: {tracks}
+  });
+
+};
+export const getPlaylistTracks = (url) => {
+  return ax({
+    method: 'get',
+    url,
+  });
+};

@@ -31,7 +31,6 @@ const Concert = ({artistsConcerts, currentlyPlaying}) => {
       };
     }
   });
-  console.log('CONCERTSMAP', concertsMap)
   return (
     <Concerts>
       {Object.keys(concertsMap).map((concert, i) => {
