@@ -5,7 +5,17 @@ import {Button} from 'react-bootstrap';
 import CurrentlyPlaying from './CurrentlyPlaying';
 import Concerts from './Concerts';
 
-export default ({concertDate, locationName, iframeSrc, currentlyPlaying, artistsConcerts, loading, display}) => {
+export default (
+  {
+    concertDate,
+    locationName,
+    iframeSrc,
+    currentlyPlaying,
+    artistsConcerts,
+    loading,
+    display,
+  },
+) => {
   return (
     <div>
       <div className="listenTitle">
@@ -15,9 +25,7 @@ export default ({concertDate, locationName, iframeSrc, currentlyPlaying, artists
         </div>
         {concertDate ? <div className="on">on</div> : null}
         <div>
-          {concertDate
-            ? moment(concertDate).format('ddd MMM D')
-            : null}
+          {concertDate ? moment(concertDate).format('ddd MMM D') : null}
         </div>
         <div>
           {locationName}
@@ -28,11 +36,12 @@ export default ({concertDate, locationName, iframeSrc, currentlyPlaying, artists
             <img src={tenor} alt="fireSpot" />
           </div>
         : null}
-      <Button onClick={()=>display('tomorrowConcerts')}>Show Concerts Tomorrow</Button>
-      <CurrentlyPlaying
-        iframeSrc={iframeSrc}
-        {...currentlyPlaying}
-      />
+      {!loading
+        ? <Button onClick={() => display('tomorrowConcerts')}>
+            Show Concerts Tomorrow
+          </Button>
+        : null}
+      <CurrentlyPlaying iframeSrc={iframeSrc} {...currentlyPlaying} />
 
       <Concerts
         currentlyPlaying={currentlyPlaying}
