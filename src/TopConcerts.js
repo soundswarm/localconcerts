@@ -36,11 +36,11 @@ export default (
             <img src={tenor} alt="fireSpot" />
           </div>
         : null}
-      {!loading
+      {/* {!loading
         ? <Button onClick={() => display('tomorrowConcerts')}>
             Show Concerts Tomorrow
           </Button>
-        : null}
+        : null} */}
       <CurrentlyPlaying iframeSrc={iframeSrc} {...currentlyPlaying} />
 
       <Concerts
