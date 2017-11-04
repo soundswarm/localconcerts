@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
+import moment from 'moment';
 const Concerts = styled.div`
   max-width: 600px;
   margin: auto;
@@ -19,6 +19,12 @@ const ConcertStyle = styled.div`
 const Artists = styled.span`
 `;
 
+const ConcertInfo = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-left: 20px;
+`;
 const Concert = ({artistsConcerts, currentlyPlaying}) => {
   const concertsMap = {};
   artistsConcerts.forEach(concert => {
@@ -38,19 +44,36 @@ const Concert = ({artistsConcerts, currentlyPlaying}) => {
           margin-left: 10px;
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
         `;
+
         const ConcertName = styled.div`
           font-size: 20px;
           opacity: .6;
           text-decoration: underline;
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
         `;
+        const ConcertDate = styled.span`
+          font-size: 20px;
+          opacity: .6;
+          text-decoration: none;
+          ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
+          margin-left: 20px;
+        `;
+
         return (
           <ConcertStyle
             key={i}
             onClick={() =>
               window.open(concertsMap[concert].concert.uri, '_blank')}
           >
-            <ConcertName>{concert} {concertsMap[concert].concert.start.date}</ConcertName>
+            {' '}<ConcertInfo>
+              <ConcertName>
+                {concert}
+
+              </ConcertName>
+              <ConcertDate>
+                {moment(concertsMap[concert].concert.start.date).format('ll')}
+              </ConcertDate>
+            </ConcertInfo>
             <Artists>
               {concertsMap[concert].concert.performance.map((artist, i) => (
                 <Artist key={i + 1000}> {artist.displayName}</Artist>
