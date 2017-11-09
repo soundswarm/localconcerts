@@ -165,7 +165,7 @@ class Listen extends Component {
                       return {uri: track.track.uri, positions: [i]};
                     },
                   );
-                  actions
+                  return actions
                     .deletePlaylistTracks(
                       this.spotifyUserId,
                       playlist.id,
@@ -194,7 +194,7 @@ class Listen extends Component {
                           console.log('pid', this, tracks);
                           return actions
                             .addTracksToPlaylist({
-                              playlistId: this.playListId,
+                              playlistId: playlist.id,
                               spotifyUserId: this.spotifyUserId,
                               tracks: tracks.reduce(
                                 (mem, track) => {
@@ -235,6 +235,7 @@ class Listen extends Component {
                 });
                 return;
               }
+              return
             }
             // if no plalist exists:
             // createPlaylistAndDisplay()
