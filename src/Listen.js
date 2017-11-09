@@ -263,7 +263,17 @@ class Listen extends Component {
                 let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
 
                 if (this.state.view === 'tomorrowConcerts') {
+
+
                   this.artistsPlayingConcertsTomorrow().then(tracks => {
+                    console.log('artistsPlayingConcertsTomorrowtrac', tracks)
+                    const artistsConcerts = {...this.state.artistsConcerts};
+                    artistsConcerts[this.state.view] = tracks.slice(
+                      0,
+                      this.maxSongsToDisplay,
+                    );
+                    this.setState({artistsConcerts});
+
                     actions
                       .addTracksToPlaylist({
                         playlistId: this.playListId,

@@ -37,7 +37,6 @@ export const getLocation = () => {
   });
 };
 export const addTracksToPlaylist = ({spotifyUserId, playlistId, tracks}) => {
-  console.log('SPOTIFYUSERID', spotifyUserId)
   return ax({
     method: 'post',
     url: `https://api.spotify.com/v1/users/${spotifyUserId}/playlists/${playlistId}/tracks`,
@@ -96,7 +95,6 @@ export const getUsersTopArtists = (url = `https://api.spotify.com/v1/me/top/arti
 };
 
 export const deletePlaylistTracks = (userId, playlistId, tracks) => {
-  console.log('TRACKS', tracks)
   return ax({
     method: 'delete',
     url: `${url}users/${userId}/playlists/${playlistId}/tracks`,

@@ -25,7 +25,7 @@ const ConcertInfo = styled.div`
   justify-content: center;
   margin-left: 20px;
 `;
-const Concert = ({artistsConcerts, currentlyPlaying}) => {
+const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
   const concertsMap = {};
   artistsConcerts.forEach(concert => {
     if (concertsMap[concert.concert.venue.displayName]) {
@@ -70,9 +70,13 @@ const Concert = ({artistsConcerts, currentlyPlaying}) => {
                 {concert}
 
               </ConcertName>
-              <ConcertDate>
-                {moment(concertsMap[concert].concert.start.date).format('ll')}
-              </ConcertDate>
+              {view === 'topConcerts'
+                ? <ConcertDate>
+                    {moment(concertsMap[concert].concert.start.date).format(
+                      'll',
+                    )}
+                  </ConcertDate>
+                : null}
             </ConcertInfo>
             <Artists>
               {concertsMap[concert].concert.performance.map((artist, i) => (
