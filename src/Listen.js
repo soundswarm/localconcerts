@@ -19,7 +19,7 @@ class Listen extends Component {
       currentlyPlaying: {},
       locationName: '',
       loading: false,
-      view: 'topConcerts',
+      view: 'tomorrowConcerts',//'topConcerts',
       showTomorrowButton: false,
     };
     this.ax = null;
@@ -272,14 +272,17 @@ class Listen extends Component {
                       0,
                       this.maxSongsToDisplay,
                     );
+                    console.log('ARTISTSCONCERTS', artistsConcerts)
                     this.setState({artistsConcerts});
-
+                    console.log('tpl',this.playlistId)
                     actions
                       .addTracksToPlaylist({
                         playlistId: this.playListId,
                         spotifyUserId: this.spotifyUserId,
                         tracks: tracks.reduce(
                           (mem, track) => {
+                            console.log('TRACK', track)
+
                             if (track.tracks.items[0]) {
                               mem.push(track.tracks.items[0].uri);
                             }
