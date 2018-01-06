@@ -71,7 +71,7 @@ export const getArtistConcerts = artist_name => {
     },
   });
 };
-export const createNewPlalist = (datas, spotifyUserId) => {
+export const createNewPlaylist = (datas, spotifyUserId) => {
   return ax({
     method: 'post',
     url: `${url}users/${spotifyUserId}/playlists`,

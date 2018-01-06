@@ -5,6 +5,7 @@ import CurrentlyPlaying from './CurrentlyPlaying';
 import Concerts from './Concerts';
 
 export default ({concertDate, locationName, iframeSrc, currentlyPlaying, artistsConcerts, loading})=>{
+  console.log('{CONCERTDATE, LOCATIONNAME, IFRAMESRC, CURRENTLYPLAYING, ARTISTSCONCERTS, LOADING', concertDate, locationName, iframeSrc, currentlyPlaying, artistsConcerts, loading)
   return (
     <div>
       <div className="listenTitle">

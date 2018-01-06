@@ -28,13 +28,15 @@ const ConcertInfo = styled.div`
 const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
   const concertsMap = {};
   artistsConcerts.forEach(concert => {
-    if (concertsMap[concert.concert.venue.displayName]) {
-      concertsMap[concert.concert.venue.displayName].artists.push(concert);
-    } else {
-      concertsMap[concert.concert.venue.displayName] = {
-        ...concert,
-        artists: [concert.artistName],
-      };
+    if(concert.concert){
+      if (concertsMap[concert.concert.venue.displayName]) {
+        concertsMap[concert.concert.venue.displayName].artists.push(concert);
+      } else {
+        concertsMap[concert.concert.venue.displayName] = {
+          ...concert,
+          artists: [concert.artistName],
+        };
+      }
     }
   });
   return (

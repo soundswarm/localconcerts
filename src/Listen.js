@@ -10,6 +10,7 @@ import tenor from './tenor.gif';
 import * as actions from './actions';
 const OAuth = window.OAuth;
 const url = 'https://api.spotify.com/v1/';
+const analytics = window.analytics;
 class Listen extends Component {
   constructor(props) {
     super(props);
@@ -125,13 +126,14 @@ class Listen extends Component {
       this.props.history.push('/');
       return;
     }
+
     oauthCallback.done(spotify => {
       this.accessToken = spotify.access_token;
 
       actions.initializeAxios(this.accessToken);
 
       spotify.me().done(data => {
-        const analytics = window.analytics;
+
 
         this.spotifyUserId = data.id;
 
@@ -143,249 +145,243 @@ class Listen extends Component {
             0
           ].city.displayName;
           this.setState({locationName});
-          if (this.state.view === 'topConcerts') {
-            this.playlist = 'Top Concerts';
-          }
-          if (this.state.view === 'tomorrowConcerts') {
-            let tomorrow = moment(new Date()).add(1, 'days').format('MMM DD');
-            this.playlist = locationName + ` - ${tomorrow}`;
-          }
 
-          actions.getPlaylists(this.spotifyUserId).then(res => {
-            const playlist = res.data.items.filter(playlist => {
-              return playlist.name === this.playlist;
-            })[0];
-            if (playlist) {
-              this.playlistId = playlist.id;
-              this.existingPlaylist = true;
-              let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
-              this.setState({iframeSrc: uri, loading: false});
-              analytics.track('iframeLoadedFromExisting', {uri});
+          this.display(locationName);
 
-              if (this.state.view === 'topConcerts') {
-                actions.getPlaylistTracks(playlist.href).then(res => {
-                  const playlistTracks = res.data.tracks.items.map(
-                    (track, i) => {
-                      return {uri: track.track.uri, positions: [i]};
-                    },
-                  );
-                  return actions
-                    .deletePlaylistTracks(
-                      this.spotifyUserId,
-                      playlist.id,
-                      playlistTracks,
-                    )
-                    .then(() => {
-                      return this.topArtistsConcerts()
-                        .then(artists => {
-                          artists = artists.slice(0, this.maxSongsToDisplay);
-                          const artistsConcerts = {
-                            ...this.state.artistsConcerts,
-                          };
-                          artistsConcerts[this.state.view] = artists.slice(
-                            0,
-                            this.maxSongsToDisplay,
-                          );
-                          this.setState({
-                            artistsConcerts,
-                          });
-                          return Promise.all(
-                            artists.map(({artistName, concert}) => {
-                              const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
-                              return spotify.get(url).done(res => {
-                                return res.tracks.items.map(track => track.uri);
-                              });
-                            }),
-                          );
-                        })
-                        .then(tracks => {
-                          return actions
-                            .addTracksToPlaylist({
-                              playlistId: playlist.id,
-                              spotifyUserId: this.spotifyUserId,
-                              tracks: tracks.reduce(
-                                (mem, track) => {
-                                  if (track.tracks.items[0]) {
-                                    mem.push(track.tracks.items[0].uri);
-                                  }
-                                  return mem;
-                                },
-                                [],
-                              ),
-                            })
-                            .then(() => {
-                              this.getCurrentSongAndDisplay();
-                              this.setState({
-                                iframeSrc: uri,
-                                loading: false,
-                                showTomorrowButton: true,
-                              });
-                              analytics.track('iframeLoadedFromNew', {uri});
-                            });
-                        });
-                    });
-                });
-              }
-              if (this.state.view === 'tomorrowConcerts') {
-                this.getCurrentSongAndDisplay();
-                this.artistsPlayingConcertsTomorrow().then(artists => {
-                  const artistsConcerts = {...this.state.artistsConcerts};
-                  artistsConcerts[this.state.view] = artists.slice(
-                    0,
-                    this.maxSongsToDisplay,
-                  );
-                  this.setState({artistsConcerts});
-                  if (this.state.view === 'tomorrowConcerts') {
-                    this.setState({
-                      concertDate: artistsConcerts[this.state.view][
-                        0
-                      ].concert.start.date,
-                    });
-                  }
-                });
-                return;
-              }
-              return;
-            }
-            // if no plalist exists:
-            // createPlaylistAndDisplay()
-            actions
-              .createNewPlalist(
-                {
-                  name: this.playlist,
-                  description: 'A playlist by seemusiq.com',
-                },
-                this.spotifyUserId,
-              )
-              .then(r => {
-                // handle this
-                this.playListId = r.data.id;
-                let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
-
-                if (this.state.view === 'tomorrowConcerts') {
-                  return (
-                    this.artistsPlayingConcertsTomorrow()
-                      // this.topArtistsConcerts()
-                      .then(artists => {
-                        artists = artists.slice(0, this.maxSongsToDisplay);
-
-
-                        const artistsConcertsNewState = {
-                          ...this.state.artistsConcerts,
-                        };
-                        artistsConcertsNewState.tomorrowConcerts = artists.slice(
-                          0,
-                          this.maxSongsToDisplay,
-                        );
-
-
-                        this.setState({
-                          artistsConcerts: artistsConcertsNewState,
-                        });
-                        return Promise.all(
-                          artists.map(({artistName, concert}) => {
-                            const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
-                            return spotify.get(url).done(res => {
-                              return res.tracks.items.map(track => track.uri);
-                            });
-                          }),
-                        );
-                      })
-                      .then(tracks => {
-                        console.log('TRACKS', tracks);
-                        const artistsConcerts = {...this.state.artistsConcerts};
-                        artistsConcerts[this.state.view] = tracks.slice(
-                          0,
-                          this.maxSongsToDisplay,
-                        );
-                        console.log('ARTISTSCONCERTS', artistsConcerts);
-                        this.setState({artistsConcerts});
-                        console.log('tracks', tracks);
-                        actions
-                          .addTracksToPlaylist({
-                            playlistId: this.playListId,
-                            spotifyUserId: this.spotifyUserId,
-                            tracks: tracks.reduce(
-                              (mem, track) => {
-                                if (track.tracks.items[0]) {
-                                  mem.push(track.tracks.items[0].uri);
-                                }
-                                return mem;
-                              },
-                              [],
-                            ),
-                          })
-                          .then(() => {
-                            this.getCurrentSongAndDisplay();
-                            this.setState({
-                              iframeSrc: uri,
-                              loading: false,
-                              showTomorrowButton: true,
-                            });
-                            analytics.track('iframeLoadedFromNew', {uri});
-                          });
-                      })
-                  );
-                }
-
-                if (this.state.view === 'topConcerts') {
-                  return this.topArtistsConcerts()
-                    .then(artists => {
-                      artists = artists.slice(0, this.maxSongsToDisplay);
-                      const artistsConcerts = {...this.state.artistsConcerts};
-                      artistsConcerts[this.state.view] = artists.slice(
-                        0,
-                        this.maxSongsToDisplay,
-                      );
-                      this.setState({
-                        artistsConcerts,
-                      });
-                      return Promise.all(
-                        artists.map(({artistName, concert}) => {
-                          const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
-                          return spotify.get(url).done(res => {
-                            return res.tracks.items.map(track => track.uri);
-                          });
-                        }),
-                      );
-                    })
-                    .then(tracks => {
-                      return actions
-                        .addTracksToPlaylist({
-                          playlistId: this.playListId,
-                          spotifyUserId: this.spotifyUserId,
-                          tracks: tracks.reduce(
-                            (mem, track) => {
-                              if (track.tracks.items[0]) {
-                                mem.push(track.tracks.items[0].uri);
-                              }
-                              return mem;
-                            },
-                            [],
-                          ),
-                        })
-                        .then(() => {
-                          this.getCurrentSongAndDisplay();
-                          this.setState({
-                            iframeSrc: uri,
-                            loading: false,
-                            showTomorrowButton: true,
-                          });
-                          analytics.track('iframeLoadedFromNew', {uri});
-                        });
-                    });
-                }
-              });
-          });
+          this.executeTopConcerts(spotify)
         });
       });
     });
   }
-  display = view => {
-    this.setState({view});
+  executeTopConcerts = (spotify)=>{
+    actions.getPlaylists(this.spotifyUserId).then(res => {
+      const playlist = res.data.items.filter(playlist => {
+        return playlist.name === this.topConcertsPlaylist;
+      })[0];
+      if (playlist) {
+        this.playlistId = playlist.id;
+        this.existingPlaylist = true;
+        let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
+        this.setState({iframeSrc: uri, loading: false});
+        analytics.track('iframeLoadedFromExisting', {uri});
+
+        // if (this.state.view === 'topConcerts') {
+        actions.getPlaylistTracks(playlist.href).then(res => {
+          const playlistTracks = res.data.tracks.items.map((track, i) => {
+            return {uri: track.track.uri, positions: [i]};
+          });
+          return actions
+            .deletePlaylistTracks(
+              this.spotifyUserId,
+              playlist.id,
+              playlistTracks,
+            )
+            .then(() => {
+              return this.topArtistsConcerts()
+                .then(artists => {
+                  artists = artists.slice(0, this.maxSongsToDisplay);
+                  const artistsConcerts = {
+                    ...this.state.artistsConcerts,
+                  };
+                  artistsConcerts[this.state.view] = artists.slice(
+                    0,
+                    this.maxSongsToDisplay,
+                  );
+                  this.setState({
+                    artistsConcerts,
+                  });
+                  return Promise.all(
+                    artists.map(({artistName, concert}) => {
+                      const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
+                      return spotify.get(url).done(res => {
+                        return res.tracks.items.map(track => track.uri);
+                      });
+                    }),
+                  );
+                })
+                .then(tracks => {
+                  return actions
+                    .addTracksToPlaylist({
+                      playlistId: playlist.id,
+                      spotifyUserId: this.spotifyUserId,
+                      tracks: tracks.reduce(
+                        (mem, track) => {
+                          if (track.tracks.items[0]) {
+                            mem.push(track.tracks.items[0].uri);
+                          }
+                          return mem;
+                        },
+                        [],
+                      ),
+                    })
+                    .then(() => {
+                      this.getCurrentSongAndDisplay();
+                      this.setState({
+                        iframeSrc: uri,
+                        loading: false,
+                        showTomorrowButton: true,
+                      });
+                      analytics.track('iframeLoadedFromNew', {uri});
+                    });
+                });
+            });
+        });
+        // }
+        // if (this.state.view === 'tomorrowConcerts') {
+        this.getCurrentSongAndDisplay();
+        this.artistsPlayingConcertsTomorrow().then(artists => {
+          const artistsConcerts = {...this.state.artistsConcerts};
+          artistsConcerts[this.state.view] = artists.slice(
+            0,
+            this.maxSongsToDisplay,
+          );
+          this.setState({artistsConcerts});
+          if (this.state.view === 'tomorrowConcerts') {
+            this.setState({
+              concertDate: artistsConcerts[this.state.view][
+                0
+              ].concert.start.date,
+            });
+          }
+        });
+        // }
+        return;
+      }
+      // if no plalist exists:
+      // createPlaylistAndDisplay()
+      actions
+        .createNewPlaylist(
+          {
+            name: this.topConcertsPlaylist,
+            description: 'A playlist by seemusiq.com',
+          },
+          this.spotifyUserId,
+        )
+        .then(r => {
+          // handle this
+          this.playListId = r.data.id;
+          let uri = 'https://open.spotify.com/embed?uri=' + r.data.uri; //external_urls.spotify.replace('http', 'https')
+
+          // if (this.state.view === 'tomorrowConcerts') {
+
+          // // this.artistsPlayingConcertsTomorrow()
+          //   // this.topArtistsConcerts()
+          //   .then(artists => {
+          //     artists = artists.slice(0, this.maxSongsToDisplay);
+          //
+          //     const artistsConcertsNewState = {
+          //       ...this.state.artistsConcerts,
+          //     };
+          //     artistsConcertsNewState.tomorrowConcerts = artists.slice(
+          //       0,
+          //       this.maxSongsToDisplay,
+          //     );
+          //
+          //     this.setState({
+          //       artistsConcerts: artistsConcertsNewState,
+          //     });
+          //     return Promise.all(
+          //       artists.map(({artistName, concert}) => {
+          //         const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
+          //         return spotify.get(url).done(res => {
+          //           return res.tracks.items.map(track => track.uri);
+          //         });
+          //       }),
+          //     );
+          //   })
+          //   .then(tracks => {
+          //     console.log('TRACKS', tracks);
+          //     const artistsConcerts = {...this.state.artistsConcerts};
+          //     artistsConcerts[this.state.view] = tracks.slice(
+          //       0,
+          //       this.maxSongsToDisplay,
+          //     );
+          //     console.log('ARTISTSCONCERTS', artistsConcerts);
+          //     this.setState({artistsConcerts});
+          //     console.log('tracks', tracks);
+          //     actions
+          //       .addTracksToPlaylist({
+          //         playlistId: this.playListId,
+          //         spotifyUserId: this.spotifyUserId,
+          //         tracks: tracks.reduce(
+          //           (mem, track) => {
+          //             if (track.tracks.items[0]) {
+          //               mem.push(track.tracks.items[0].uri);
+          //             }
+          //             return mem;
+          //           },
+          //           [],
+          //         ),
+          //       })
+          //       .then(() => {
+          //         this.getCurrentSongAndDisplay();
+          //         this.setState({
+          //           iframeSrc: uri,
+          //           loading: false,
+          //           showTomorrowButton: true,
+          //         });
+          //         analytics.track('iframeLoadedFromNew', {uri});
+          //       });
+          //   });
+
+          // }
+
+          // if (this.state.view === 'topConcerts') {
+          this.topArtistsConcerts()
+            .then(artists => {
+              artists = artists.slice(0, this.maxSongsToDisplay);
+              const artistsConcerts = {...this.state.artistsConcerts};
+              artistsConcerts[this.state.view] = artists.slice(
+                0,
+                this.maxSongsToDisplay,
+              );
+              this.setState({
+                artistsConcerts,
+              });
+              return Promise.all(
+                artists.map(({artistName, concert}) => {
+                  const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
+                  return spotify.get(url).done(res => {
+                    return res.tracks.items.map(track => track.uri);
+                  });
+                }),
+              );
+            })
+            .then(tracks => {
+              return actions
+                .addTracksToPlaylist({
+                  playlistId: this.playListId,
+                  spotifyUserId: this.spotifyUserId,
+                  tracks: tracks.reduce(
+                    (mem, track) => {
+                      if (track.tracks.items[0]) {
+                        mem.push(track.tracks.items[0].uri);
+                      }
+                      return mem;
+                    },
+                    [],
+                  ),
+                })
+                .then(() => {
+                  this.getCurrentSongAndDisplay();
+                  this.setState({
+                    iframeSrc: uri,
+                    loading: false,
+                    showTomorrowButton: true,
+                  });
+                  analytics.track('iframeLoadedFromNew', {uri});
+                });
+            });
+          // }
+        });
+    });
+  }
+  display = locationName => {
+    this.topConcertsPlaylist = 'Top Concerts';
+    let tomorrow = moment(new Date()).add(1, 'days').format('MMM DD');
+    this.tomorrowPlaylist = locationName + ` - ${tomorrow}`;
   };
   render() {
-    console.log('this.stae.artistsConcerts', this.state.artistsConcerts)
     const {
       concertDate,
       locationName,
@@ -398,17 +394,7 @@ class Listen extends Component {
     return (
       <div className="app">
         {this.state.view === 'tomorrowConcerts'
-          ? <TomorrowConcerts
-              {...{
-                concertDate,
-                locationName,
-                iframeSrc,
-                currentlyPlaying,
-                artistsConcerts: artistsConcerts.tomorrowConcerts,
-                loading,
-                display: this.display,
-              }}
-            />
+          ? null
           : <TopConcerts
               {...{
                 concertDate,
