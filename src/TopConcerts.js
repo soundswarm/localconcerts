@@ -13,7 +13,7 @@ export default (
     currentlyPlaying,
     artistsConcerts,
     loading,
-    display,
+    displayTomorrowConcerts,
   },
 ) => {
   return (
@@ -37,7 +37,7 @@ export default (
           </div>
         : null}
       {!loading
-        ? <Button onClick={() => display('tomorrowConcerts')}>
+        ? <Button onClick={() => displayTomorrowConcerts()}>
             Show Concerts Tomorrow
           </Button>
         : null}
