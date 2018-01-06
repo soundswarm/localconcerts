@@ -23,10 +23,6 @@ export default (
         <div>
           Recommended For You
         </div>
-        {concertDate ? <div className="on">on</div> : null}
-        <div>
-          {concertDate ? moment(concertDate).format('ddd MMM D') : null}
-        </div>
         <div>
           {locationName}
         </div>
