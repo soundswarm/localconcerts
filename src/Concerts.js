@@ -28,7 +28,7 @@ const ConcertInfo = styled.div`
 const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
   const concertsMap = {};
   artistsConcerts.forEach(concert => {
-    if(concert.concert){
+    if (concert.concert) {
       if (concertsMap[concert.concert.venue.displayName]) {
         concertsMap[concert.concert.venue.displayName].artists.push(concert);
       } else {
@@ -60,7 +60,6 @@ const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
           margin-left: 20px;
         `;
-        console.log('nie', view)
         return (
           <ConcertStyle
             key={i}

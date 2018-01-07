@@ -2,14 +2,10 @@ import React, {Component} from 'react';
 import moment from 'moment';
 import _ from 'lodash';
 import ss from 'string-similarity';
-import CurrentlyPlaying from './CurrentlyPlaying';
-import Concerts from './Concerts';
 import TomorrowConcerts from './TomorrowConcerts';
 import TopConcerts from './TopConcerts';
-import tenor from './tenor.gif';
 import * as actions from './actions';
 const OAuth = window.OAuth;
-const url = 'https://api.spotify.com/v1/';
 const analytics = window.analytics;
 class Listen extends Component {
   constructor(props) {
@@ -96,15 +92,13 @@ class Listen extends Component {
         }),
       ).then(re => {
         const artists = [];
-        const actualConcerts = re
-          .filter(r => r.data.resultsPage.totalEntries > 0)
-          .forEach(res => {
-            const concert = res.data.resultsPage.results.event[0];
-            concert.performance.forEach(artist => {
-              const artistName = artist.artist.displayName;
-              artists.push({artistName, concert});
-            });
+        re.filter(r => r.data.resultsPage.totalEntries > 0).forEach(res => {
+          const concert = res.data.resultsPage.results.event[0];
+          concert.performance.forEach(artist => {
+            const artistName = artist.artist.displayName;
+            artists.push({artistName, concert});
           });
+        });
 
         return artists.sort((a, b) => {
           return moment(a.concert.start.date) < moment(b.concert.start.date)
@@ -222,15 +216,12 @@ class Listen extends Component {
               );
             })
             .then(tracks => {
-              console.log('TRACKS', tracks);
               const artistsConcerts = {...this.state.artistsConcerts};
               artistsConcerts[this.state.view] = tracks.slice(
                 0,
                 this.maxSongsToDisplay,
               );
-              console.log('ARTISTSCONCERTS', artistsConcerts);
               this.setState({artistsConcerts});
-              console.log('tracks', tracks);
               actions
                 .addTracksToPlaylist({
                   playlistId: this.playListId,
@@ -421,9 +412,9 @@ class Listen extends Component {
     this.executeTomorrowConcerts(this.spotify);
     this.setState({view: 'tomorrowConcerts'});
   };
-  displayTopConcerts = ()=>{
-    this.setState({view: 'topConcerts'})
-  }
+  displayTopConcerts = () => {
+    this.setState({view: 'topConcerts'});
+  };
   render() {
     const {
       concertDate,
