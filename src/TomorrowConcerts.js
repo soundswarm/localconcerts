@@ -27,24 +27,14 @@ export default (
   );
   return (
     <div>
-      <div className="listenTitle">
-        LOCAL
-        <div>
-          CONCERTS
-        </div>
-        {concertDate ? <div className="on">on</div> : null}
-        <div>
-          {concertDate ? moment(concertDate).format('ddd MMM D') : null}
-        </div>
-        <div>
-          {locationName}
-        </div>
-      </div>
+
       {loading
         ? <div className="gif">
             <img src={tenor} alt="fireSpot" />
           </div>
         : null}
+
+      <CurrentlyPlaying iframeSrc={iframeSrc} {...currentlyPlaying} />
       {!loading
         ? <Button
             className="switchConcertsButton left"
@@ -53,8 +43,18 @@ export default (
             Show My Top Concerts
           </Button>
         : null}
-      <CurrentlyPlaying iframeSrc={iframeSrc} {...currentlyPlaying} />
-
+        <div className="listenTitle">
+          <div>
+            CONCERTS
+          </div>
+          {concertDate ? <div className="on">on</div> : null}
+          <div>
+            {concertDate ? moment(concertDate).format('ddd MMM D') : null}
+          </div>
+          <div>
+            {locationName}
+          </div>
+        </div>
       <Concerts
         currentlyPlaying={currentlyPlaying}
         artistsConcerts={artistsConcerts}

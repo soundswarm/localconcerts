@@ -19,6 +19,21 @@ export default (
   console.log('artistsConcerts', artistsConcerts);
   return (
     <div>
+      {loading
+        ? <div className="gif">
+            <img src={tenor} alt="fireSpot" />
+          </div>
+        : null}
+
+      <CurrentlyPlaying iframeSrc={iframeSrc} {...currentlyPlaying} />
+      {!loading
+        ? <Button
+            className="switchConcertsButton right"
+            onClick={() => displayTomorrowConcerts()}
+          >
+            Show Concerts Tomorrow
+          </Button>
+        : null}
       <div className="listenTitle">
         CONCERTS
         <div>
@@ -28,21 +43,6 @@ export default (
           {locationName}
         </div>
       </div>
-      {loading
-        ? <div className="gif">
-            <img src={tenor} alt="fireSpot" />
-          </div>
-        : null}
-      {!loading
-        ? <Button
-            className="switchConcertsButton right"
-            onClick={() => displayTomorrowConcerts()}
-          >
-            Show Concerts Tomorrow
-          </Button>
-        : null}
-      <CurrentlyPlaying iframeSrc={iframeSrc} {...currentlyPlaying} />
-
       <Concerts
         currentlyPlaying={currentlyPlaying}
         artistsConcerts={artistsConcerts}
