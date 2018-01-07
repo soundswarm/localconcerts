@@ -60,7 +60,7 @@ const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
           margin-left: 20px;
         `;
-
+        console.log('nie', view)
         return (
           <ConcertStyle
             key={i}
@@ -75,7 +75,7 @@ const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
               {view === 'topConcerts'
                 ? <ConcertDate>
                     {moment(concertsMap[concert].concert.start.date).format(
-                      'll',
+                      'MMM Do',
                     )}
                   </ConcertDate>
                 : null}

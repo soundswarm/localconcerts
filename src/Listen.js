@@ -425,7 +425,6 @@ class Listen extends Component {
     this.setState({view: 'topConcerts'})
   }
   render() {
-    console.log(this.state);
     const {
       concertDate,
       locationName,

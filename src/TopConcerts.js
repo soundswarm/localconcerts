@@ -16,6 +16,7 @@ export default (
     displayTomorrowConcerts,
   },
 ) => {
+  console.log('artistsConcerts', artistsConcerts);
   return (
     <div>
       <div className="listenTitle">
@@ -33,7 +34,10 @@ export default (
           </div>
         : null}
       {!loading
-        ? <Button onClick={() => displayTomorrowConcerts()}>
+        ? <Button
+            className="switchConcertsButton right"
+            onClick={() => displayTomorrowConcerts()}
+          >
             Show Concerts Tomorrow
           </Button>
         : null}
@@ -42,6 +46,7 @@ export default (
       <Concerts
         currentlyPlaying={currentlyPlaying}
         artistsConcerts={artistsConcerts}
+        view="topConcerts"
       />
     </div>
   );

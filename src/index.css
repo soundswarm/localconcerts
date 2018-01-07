@@ -88,6 +88,23 @@ body {
 .playText{
   font-weight: bold;
 }
+
+
+.switchConcertsButton {
+  margin-bottom: 36px;
+
+}
+
+@media screen and (min-width: 683px) {
+  .right {
+    margin-right: -390px;
+  }
+}
+
+
+.left {
+  margin-right: 400px;
+}
 .embed-container {
     position: relative;
 

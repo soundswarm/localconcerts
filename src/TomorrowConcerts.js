@@ -46,8 +46,11 @@ export default (
           </div>
         : null}
       {!loading
-        ? <Button onClick={() => displayTopConcerts()}>
-            Show Your Top Concerts
+        ? <Button
+            className="switchConcertsButton left"
+            onClick={() => displayTopConcerts()}
+          >
+            Show My Top Concerts
           </Button>
         : null}
       <CurrentlyPlaying iframeSrc={iframeSrc} {...currentlyPlaying} />
