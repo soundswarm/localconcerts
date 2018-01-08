@@ -108,3 +108,10 @@ export const getPlaylistTracks = (url) => {
     url,
   });
 };
+
+export const getSpotifyUser = () => {
+  return ax({
+    method: 'get',
+    url: 'https://api.spotify.com/v1/me',
+  });
+};

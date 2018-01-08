@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import moment from 'moment';
 import _ from 'lodash';
 import ss from 'string-similarity';
+import queryString from 'query-string';
+
 import TomorrowConcerts from './TomorrowConcerts';
 import TopConcerts from './TopConcerts';
 import * as actions from './actions';
@@ -26,6 +28,16 @@ class Listen extends Component {
     this.maxSongsToDisplay = 100;
     this.tomorrowPlaylist = '';
     this.topConcertsPlaylist = '';
+    this.accessToken = queryString.parse(props.location.hash).access_token;
+    console.log(this.accessToken)
+    actions.initializeAxios(this.accessToken)
+    actions.getSpotifyUser().then(res=>{
+      this.spotifyUserId = res.data.id;
+      analytics.identify(this.spotifyUserId, {
+        ...res.data,
+      });
+    })
+
   }
 
   getCurrentSongAndDisplay = () => {
@@ -111,29 +123,23 @@ class Listen extends Component {
 
   componentDidMount() {
     this.setState({loading: true});
-    if (_.isNil(OAuth)) {
-      this.props.history.push('/');
-      return;
-    }
-    OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
-    const oauthCallback = OAuth.callback('spotify', {cache: true});
-    if (_.isNil(oauthCallback)) {
-      this.props.history.push('/');
-      return;
-    }
 
-    oauthCallback.done(spotify => {
-      this.spotify = spotify;
-      this.accessToken = spotify.access_token;
+    // if (_.isNil(OAuth)) {
+    //   this.props.history.push('/');
+    //   return;
+    // }
+    // OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
+    // const oauthCallback = OAuth.callback('spotify', {cache: true});
+    // if (_.isNil(oauthCallback)) {
+    //   this.props.history.push('/');
+    //   return;
+    // }
 
-      actions.initializeAxios(this.accessToken);
+    //
+    //   spotify.me().done(data => {
+    //     this.spotifyUserId = data.id;
+    //
 
-      spotify.me().done(data => {
-        this.spotifyUserId = data.id;
-
-        analytics.identify(this.spotifyUserId, {
-          ...data,
-        });
         actions.getLocation().then(loc => {
           const locationName = loc.data.resultsPage.results.location[
             0
@@ -144,8 +150,8 @@ class Listen extends Component {
 
           this.executeTopConcerts(spotify);
         });
-      });
-    });
+    //   });
+    // });
   }
   executeTomorrowConcerts = spotify => {
     actions.getPlaylists(this.spotifyUserId).then(res => {

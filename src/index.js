@@ -5,14 +5,15 @@ import App from './App';
 import Listen from './Listen';
 import registerServiceWorker from './registerServiceWorker';
 // import {Router, Route, Redirect} from 'react-router';
-import {  HashRouter,  Route} from 'react-router-dom';
+import { Router } from 'react-router';
+import {  BrowserRouter,  Route} from 'react-router-dom';
 ReactDOM.render(
-  <HashRouter>
+  <BrowserRouter>
     <div className='mainContainer'>
       <Route exact path="/" component={App} />
       <Route path="/listen" component={Listen} />
     </div>
-  </HashRouter>,
+  </BrowserRouter>,
   document.getElementById('root'),
 );
 registerServiceWorker();

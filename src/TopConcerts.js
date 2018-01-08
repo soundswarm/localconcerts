@@ -15,7 +15,6 @@ export default (
     displayTomorrowConcerts,
   },
 ) => {
-  console.log('artistsConcerts', artistsConcerts);
   return (
     <div>
       {loading
