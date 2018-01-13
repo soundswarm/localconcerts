@@ -16,15 +16,6 @@ export default (
     displayTopConcerts,
   },
 ) => {
-  console.log(
-    '{CONCERTDATE, LOCATIONNAME, IFRAMESRC, CURRENTLYPLAYING, ARTISTSCONCERTS, LOADING',
-    concertDate,
-    locationName,
-    iframeSrc,
-    currentlyPlaying,
-    artistsConcerts,
-    loading,
-  );
   return (
     <div>
 

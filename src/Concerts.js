@@ -28,7 +28,7 @@ const ConcertInfo = styled.div`
 const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
   const concertsMap = {};
   artistsConcerts.forEach(concert => {
-    if (concert.concert) {
+    if (concert && concert.concert) {
       if (concertsMap[concert.concert.venue.displayName]) {
         concertsMap[concert.concert.venue.displayName].artists.push(concert);
       } else {
@@ -39,6 +39,7 @@ const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
       }
     }
   });
+
   return (
     <Concerts>
       {Object.keys(concertsMap).map((concert, i) => {
@@ -69,7 +70,6 @@ const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
             {' '}<ConcertInfo>
               <ConcertName>
                 {concert}
-
               </ConcertName>
               {view === 'topConcerts'
                 ? <ConcertDate>

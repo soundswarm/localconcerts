@@ -115,3 +115,18 @@ export const getSpotifyUser = () => {
     url: 'https://api.spotify.com/v1/me',
   });
 };
+
+export const getArtistTrack = (artistName) => {
+  return ax({
+    method: 'get',
+    url: `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`,
+  })
+  .then(res=>{
+      return res.data.tracks.items.map(track => track.uri)[0];
+
+  })
+};
+
+
+
+`https://api.spotify.com/v1/search?q=artist:Shamir&type=track&limit=1`

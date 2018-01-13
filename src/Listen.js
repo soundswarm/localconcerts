@@ -18,7 +18,6 @@ class Listen extends Component {
       locationName: '',
       loading: false,
       view: 'topConcerts',
-      showTomorrowButton: false,
     };
     this.ax = null;
     this.concertDate = null;
@@ -29,15 +28,23 @@ class Listen extends Component {
     this.tomorrowPlaylist = '';
     this.topConcertsPlaylist = '';
     this.accessToken = queryString.parse(props.location.hash).access_token;
-    console.log(this.accessToken)
-    actions.initializeAxios(this.accessToken)
-    actions.getSpotifyUser().then(res=>{
+    actions.initializeAxios(this.accessToken);
+    actions.getSpotifyUser().then(res => {
       this.spotifyUserId = res.data.id;
       analytics.identify(this.spotifyUserId, {
         ...res.data,
       });
-    })
+      actions.getLocation().then(loc => {
+        const locationName = loc.data.resultsPage.results.location[
+          0
+        ].city.displayName;
+        this.setState({locationName});
 
+        this.display(locationName);
+
+        this.executeTopConcerts();
+      });
+    });
   }
 
   getCurrentSongAndDisplay = () => {
@@ -45,12 +52,16 @@ class Listen extends Component {
       const spotifySong = res.data.item;
 
       if (spotifySong && spotifySong.duration_ms) {
-        setTimeout(this.getCurrentSongAndDisplay, 6000);
+        this.interval = setTimeout(this.getCurrentSongAndDisplay, 6000);
         const artistPlaying = spotifySong.artists[0].name;
 
         const newState = {...this.state};
         this.state.artistsConcerts[this.state.view].forEach((artist, i) => {
-          if (ss.compareTwoStrings(artist.artistName, artistPlaying) > 0.5) {
+          if (
+            artist.artistName &&
+            artistPlaying &&
+            ss.compareTwoStrings(artist.artistName, artistPlaying) > 0.5
+          ) {
             newState.artistsConcerts[this.state.view][
               i
             ].currentlyPlaying = true;
@@ -123,37 +134,8 @@ class Listen extends Component {
 
   componentDidMount() {
     this.setState({loading: true});
-
-    // if (_.isNil(OAuth)) {
-    //   this.props.history.push('/');
-    //   return;
-    // }
-    // OAuth.initialize('hPtKTa_GQdn9yfGJA4GYZzakU5s');
-    // const oauthCallback = OAuth.callback('spotify', {cache: true});
-    // if (_.isNil(oauthCallback)) {
-    //   this.props.history.push('/');
-    //   return;
-    // }
-
-    //
-    //   spotify.me().done(data => {
-    //     this.spotifyUserId = data.id;
-    //
-
-        actions.getLocation().then(loc => {
-          const locationName = loc.data.resultsPage.results.location[
-            0
-          ].city.displayName;
-          this.setState({locationName});
-
-          this.display(locationName);
-
-          this.executeTopConcerts(spotify);
-        });
-    //   });
-    // });
   }
-  executeTomorrowConcerts = spotify => {
+  executeTomorrowConcerts = () => {
     actions.getPlaylists(this.spotifyUserId).then(res => {
       const playlist = res.data.items.filter(playlist => {
         return playlist.name === this.tomorrowPlaylist;
@@ -164,7 +146,7 @@ class Listen extends Component {
         let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
         this.setState({iframeSrc: uri, loading: false});
         analytics.track('iframeLoadedFromExisting', {uri});
-        this.getCurrentSongAndDisplay();
+        // this.getCurrentSongAndDisplay();
         this.artistsPlayingConcertsTomorrow().then(artists => {
           const artistsConcerts = {...this.state.artistsConcerts};
           artistsConcerts[this.state.view] = artists.slice(
@@ -172,18 +154,15 @@ class Listen extends Component {
             this.maxSongsToDisplay,
           );
           this.setState({artistsConcerts});
-          if (this.state.view === 'tomorrowConcerts') {
-            this.setState({
-              concertDate: artistsConcerts[this.state.view][
-                0
-              ].concert.start.date,
-            });
-          }
+          this.setState({
+            concertDate: artistsConcerts[this.state.view][0].concert.start.date,
+          });
         });
         return;
       }
       // if no plalist exists:
       // createPlaylistAndDisplay()
+      // clearInterval(this.interval)
       actions
         .createNewPlaylist(
           {
@@ -214,40 +193,26 @@ class Listen extends Component {
               });
               return Promise.all(
                 artists.map(({artistName, concert}) => {
-                  const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
-                  return spotify.get(url).done(res => {
-                    return res.tracks.items.map(track => track.uri);
-                  });
+                  return actions.getArtistTrack(artistName);
                 }),
               );
             })
             .then(tracks => {
+              tracks = tracks.filter(track => !_.isNil(track))
               const artistsConcerts = {...this.state.artistsConcerts};
-              artistsConcerts[this.state.view] = tracks.slice(
-                0,
-                this.maxSongsToDisplay,
-              );
+              artistsConcerts[this.state.view] = tracks.slice(0, this.maxSongsToDisplay);
               this.setState({artistsConcerts});
               actions
                 .addTracksToPlaylist({
                   playlistId: this.playListId,
                   spotifyUserId: this.spotifyUserId,
-                  tracks: tracks.reduce(
-                    (mem, track) => {
-                      if (track.tracks.items[0]) {
-                        mem.push(track.tracks.items[0].uri);
-                      }
-                      return mem;
-                    },
-                    [],
-                  ),
+                  tracks,
                 })
-                .then(() => {
-                  this.getCurrentSongAndDisplay();
+                .then(t => {
+                  // this.getCurrentSongAndDisplay();
                   this.setState({
                     iframeSrc: uri,
                     loading: false,
-                    showTomorrowButton: true,
                   });
                   analytics.track('iframeLoadedFromNew', {uri});
                 });
@@ -255,7 +220,7 @@ class Listen extends Component {
         });
     });
   };
-  executeTopConcerts = spotify => {
+  executeTopConcerts = () => {
     actions.getPlaylists(this.spotifyUserId).then(res => {
       const playlist = res.data.items.filter(playlist => {
         return playlist.name === this.topConcertsPlaylist;
@@ -293,10 +258,7 @@ class Listen extends Component {
                   });
                   return Promise.all(
                     artists.map(({artistName, concert}) => {
-                      const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
-                      return spotify.get(url).done(res => {
-                        return res.tracks.items.map(track => track.uri);
-                      });
+                      return actions.getArtistTrack(artistName);
                     }),
                   );
                 })
@@ -305,22 +267,13 @@ class Listen extends Component {
                     .addTracksToPlaylist({
                       playlistId: playlist.id,
                       spotifyUserId: this.spotifyUserId,
-                      tracks: tracks.reduce(
-                        (mem, track) => {
-                          if (track.tracks.items[0]) {
-                            mem.push(track.tracks.items[0].uri);
-                          }
-                          return mem;
-                        },
-                        [],
-                      ),
+                      tracks,
                     })
                     .then(() => {
-                      this.getCurrentSongAndDisplay();
+                      // this.getCurrentSongAndDisplay();
                       this.setState({
                         iframeSrc: uri,
                         loading: false,
-                        showTomorrowButton: true,
                       });
                       analytics.track('iframeLoadedFromNew', {uri});
                     });
@@ -328,22 +281,7 @@ class Listen extends Component {
             });
         });
 
-        this.getCurrentSongAndDisplay();
-        // this.artistsPlayingConcertsTomorrow().then(artists => {
-        //   const artistsConcerts = {...this.state.artistsConcerts};
-        //   artistsConcerts[this.state.view] = artists.slice(
-        //     0,
-        //     this.maxSongsToDisplay,
-        //   );
-        //   this.setState({artistsConcerts});
-        //   if (this.state.view === 'tomorrowConcerts') {
-        //     this.setState({
-        //       concertDate: artistsConcerts[this.state.view][
-        //         0
-        //       ].concert.start.date,
-        //     });
-        //   }
-        // });
+        // this.getCurrentSongAndDisplay();
         return;
       }
       // if no plalist exists:
@@ -374,10 +312,7 @@ class Listen extends Component {
               });
               return Promise.all(
                 artists.map(({artistName, concert}) => {
-                  const url = `https://api.spotify.com/v1/search?q=artist:${artistName}&type=track&limit=1`;
-                  return spotify.get(url).done(res => {
-                    return res.tracks.items.map(track => track.uri);
-                  });
+                  return actions.getArtistTrack(artistName);
                 }),
               );
             })
@@ -386,22 +321,13 @@ class Listen extends Component {
                 .addTracksToPlaylist({
                   playlistId: this.playListId,
                   spotifyUserId: this.spotifyUserId,
-                  tracks: tracks.reduce(
-                    (mem, track) => {
-                      if (track.tracks.items[0]) {
-                        mem.push(track.tracks.items[0].uri);
-                      }
-                      return mem;
-                    },
-                    [],
-                  ),
+                  tracks,
                 })
                 .then(() => {
                   this.getCurrentSongAndDisplay();
                   this.setState({
                     iframeSrc: uri,
                     loading: false,
-                    showTomorrowButton: true,
                   });
                   analytics.track('iframeLoadedFromNew', {uri});
                 });
