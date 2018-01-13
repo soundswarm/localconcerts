@@ -9,8 +9,9 @@ class App extends Component {
     });
   }
   connectSpotify=()=> {
-    let spotifyAuthUrl = 'https://accounts.spotify.com/authorize?client_id=5558527c701b4eaaa340858ec6cd8cb8&response_type=token&state=123&redirect_uri=';
-    spotifyAuthUrl += `${window.location.origin}/listen`
+    let spotifyAuthUrl = 'https://accounts.spotify.com/authorize?client_id=5558527c701b4eaaa340858ec6cd8cb8&response_type=token&state=123';
+    spotifyAuthUrl += `&scope=${encodeURIComponent('playlist-modify-public user-top-read user-read-currently-playing')}`
+    spotifyAuthUrl += `&redirect_uri=${window.location.origin}/listen`
     window.location = spotifyAuthUrl
   }
 
