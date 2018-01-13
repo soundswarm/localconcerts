@@ -18,11 +18,13 @@ class Listen extends Component {
       locationName: '',
       loading: false,
       view: 'topConcerts',
+      topIframeSrc: '',
+      tomorrowIframeSrc: ''
+
     };
     this.ax = null;
     this.concertDate = null;
     this.q = [];
-    this.iframeSrc = '';
     this.userFollowedArtists = [];
     this.maxSongsToDisplay = 100;
     this.tomorrowPlaylist = '';
@@ -144,7 +146,10 @@ class Listen extends Component {
         this.playlistId = playlist.id;
         this.existingPlaylist = true;
         let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
-        this.setState({iframeSrc: uri, loading: false});
+        this.setState({
+          artistsConcerts: {...this.state.artistsConcerts },
+          tomorrowIframeSrc: uri,
+          loading: false});
         analytics.track('iframeLoadedFromExisting', {uri});
         // this.getCurrentSongAndDisplay();
         this.artistsPlayingConcertsTomorrow().then(artists => {
@@ -211,7 +216,7 @@ class Listen extends Component {
                 .then(t => {
                   // this.getCurrentSongAndDisplay();
                   this.setState({
-                    iframeSrc: uri,
+                    tomorrowIframeSrc: uri,
                     loading: false,
                   });
                   analytics.track('iframeLoadedFromNew', {uri});
@@ -229,7 +234,7 @@ class Listen extends Component {
         this.playlistId = playlist.id;
         this.existingPlaylist = true;
         let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
-        this.setState({iframeSrc: uri, loading: false});
+        this.setState({topIframeSrc: uri, loading: false});
         analytics.track('iframeLoadedFromExisting', {uri});
 
         actions.getPlaylistTracks(playlist.href).then(res => {
@@ -270,9 +275,9 @@ class Listen extends Component {
                       tracks,
                     })
                     .then(() => {
-                      // this.getCurrentSongAndDisplay();
+                      this.getCurrentSongAndDisplay();
                       this.setState({
-                        iframeSrc: uri,
+                        topIframeSrc: uri,
                         loading: false,
                       });
                       analytics.track('iframeLoadedFromNew', {uri});
@@ -285,7 +290,6 @@ class Listen extends Component {
         return;
       }
       // if no plalist exists:
-      // createPlaylistAndDisplay()
       actions
         .createNewPlaylist(
           {
@@ -326,7 +330,7 @@ class Listen extends Component {
                 .then(() => {
                   this.getCurrentSongAndDisplay();
                   this.setState({
-                    iframeSrc: uri,
+                    topIframeSrc: uri,
                     loading: false,
                   });
                   analytics.track('iframeLoadedFromNew', {uri});
@@ -364,7 +368,7 @@ class Listen extends Component {
               {...{
                 concertDate,
                 locationName,
-                iframeSrc,
+                iframeSrc: this.state.tomorrowIframeSrc,
                 currentlyPlaying,
                 artistsConcerts: artistsConcerts.tomorrowConcerts,
                 loading,
@@ -375,7 +379,7 @@ class Listen extends Component {
               {...{
                 concertDate,
                 locationName,
-                iframeSrc,
+                iframeSrc: this.state.topIframeSrc,
                 currentlyPlaying,
                 artistsConcerts: artistsConcerts.topConcerts,
                 loading,
