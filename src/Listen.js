@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
 import ss from 'string-similarity';
 import queryString from 'query-string';
@@ -19,8 +20,7 @@ class Listen extends Component {
       loading: false,
       view: 'topConcerts',
       topIframeSrc: '',
-      tomorrowIframeSrc: ''
-
+      tomorrowIframeSrc: '',
     };
     this.ax = null;
     this.concertDate = null;
@@ -29,7 +29,12 @@ class Listen extends Component {
     this.maxSongsToDisplay = 100;
     this.tomorrowPlaylist = '';
     this.topConcertsPlaylist = '';
-    this.accessToken = queryString.parse(props.location.hash).access_token;
+    this.interval = null;
+    console.log('asfd',queryString.parse(props.location.hash).access_token)
+    this.accessToken = queryString.parse(props.location.hash).access_token || localStorage.accessToken
+    console.log('THIS.ACCESSTOKEN', this.accessToken)
+    localStorage.setItem('accessToken', this.accessToken);
+
     actions.initializeAxios(this.accessToken);
     actions.getSpotifyUser().then(res => {
       this.spotifyUserId = res.data.id;
@@ -48,7 +53,11 @@ class Listen extends Component {
       });
     });
   }
-
+  componentWillMount(){
+    this.context.router.history.push({
+      hash: '',
+    });
+  }
   getCurrentSongAndDisplay = () => {
     actions.getCurrentSong().then(res => {
       const spotifySong = res.data.item;
@@ -138,6 +147,7 @@ class Listen extends Component {
     this.setState({loading: true});
   }
   executeTomorrowConcerts = () => {
+    clearInterval(this.interval)
     actions.getPlaylists(this.spotifyUserId).then(res => {
       const playlist = res.data.items.filter(playlist => {
         return playlist.name === this.tomorrowPlaylist;
@@ -147,9 +157,10 @@ class Listen extends Component {
         this.existingPlaylist = true;
         let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
         this.setState({
-          artistsConcerts: {...this.state.artistsConcerts },
+          artistsConcerts: {...this.state.artistsConcerts},
           tomorrowIframeSrc: uri,
-          loading: false});
+          loading: false,
+        });
         analytics.track('iframeLoadedFromExisting', {uri});
         // this.getCurrentSongAndDisplay();
         this.artistsPlayingConcertsTomorrow().then(artists => {
@@ -167,7 +178,7 @@ class Listen extends Component {
       }
       // if no plalist exists:
       // createPlaylistAndDisplay()
-      // clearInterval(this.interval)
+      //
       actions
         .createNewPlaylist(
           {
@@ -203,9 +214,12 @@ class Listen extends Component {
               );
             })
             .then(tracks => {
-              tracks = tracks.filter(track => !_.isNil(track))
+              tracks = tracks.filter(track => !_.isNil(track));
               const artistsConcerts = {...this.state.artistsConcerts};
-              artistsConcerts[this.state.view] = tracks.slice(0, this.maxSongsToDisplay);
+              artistsConcerts[this.state.view] = tracks.slice(
+                0,
+                this.maxSongsToDisplay,
+              );
               this.setState({artistsConcerts});
               actions
                 .addTracksToPlaylist({
@@ -226,6 +240,7 @@ class Listen extends Component {
     });
   };
   executeTopConcerts = () => {
+     clearInterval(this.interval)
     actions.getPlaylists(this.spotifyUserId).then(res => {
       const playlist = res.data.items.filter(playlist => {
         return playlist.name === this.topConcertsPlaylist;
@@ -391,4 +406,7 @@ class Listen extends Component {
   }
 }
 
+Listen.contextTypes = {
+  router: PropTypes.object,
+};
 export default Listen;
