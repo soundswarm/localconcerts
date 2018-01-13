@@ -23,7 +23,7 @@ const ConcertInfo = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin-left: 20px;
+  margin-left: 30px;
 `;
 const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
   const concertsMap = {};
@@ -43,19 +43,19 @@ const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
   return (
     <Concerts>
       {Object.keys(concertsMap).map((concert, i) => {
-        const Artist = styled.div`
+        const Artist = styled.span`
           margin-left: 10px;
+          font-size: 20px;
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
         `;
 
         const ConcertName = styled.div`
-          font-size: 20px;
+          font-size: 16px;
           opacity: .6;
-          text-decoration: underline;
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
         `;
         const ConcertDate = styled.span`
-          font-size: 20px;
+          font-size: 16px;
           opacity: .6;
           text-decoration: none;
           ${concertsMap[concert].currentlyPlaying ? `color: #1DB954;` : ''}
@@ -67,7 +67,13 @@ const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
             onClick={() =>
               window.open(concertsMap[concert].concert.uri, '_blank')}
           >
-            {' '}<ConcertInfo>
+            {' '}
+            <Artists>
+              {concertsMap[concert].concert.performance.map((artist, i) => (
+                <Artist key={i + 1000}> {artist.displayName}</Artist>
+              ))}
+            </Artists>
+            <ConcertInfo>
               <ConcertName>
                 {concert}
               </ConcertName>
@@ -79,11 +85,7 @@ const Concert = ({artistsConcerts, currentlyPlaying, view}) => {
                   </ConcertDate>
                 : null}
             </ConcertInfo>
-            <Artists>
-              {concertsMap[concert].concert.performance.map((artist, i) => (
-                <Artist key={i + 1000}> {artist.displayName}</Artist>
-              ))}
-            </Artists>
+
           </ConcertStyle>
         );
       })}
