@@ -126,7 +126,3 @@ export const getArtistTrack = (artistName) => {
 
   })
 };
-
-
-
-`https://api.spotify.com/v1/search?q=artist:Shamir&type=track&limit=1`

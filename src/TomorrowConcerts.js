@@ -18,7 +18,6 @@ export default (
 ) => {
   return (
     <div>
-
       {loading
         ? <div className="gif">
             <img src={tenor} alt="fireSpot" />

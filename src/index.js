@@ -4,8 +4,6 @@ import './index.css';
 import App from './App';
 import Listen from './Listen';
 import registerServiceWorker from './registerServiceWorker';
-// import {Router, Route, Redirect} from 'react-router';
-import { Router } from 'react-router';
 import {  BrowserRouter,  Route} from 'react-router-dom';
 ReactDOM.render(
   <BrowserRouter>

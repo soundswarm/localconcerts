@@ -8,7 +8,6 @@ import queryString from 'query-string';
 import TomorrowConcerts from './TomorrowConcerts';
 import TopConcerts from './TopConcerts';
 import * as actions from './actions';
-const OAuth = window.OAuth;
 const analytics = window.analytics;
 class Listen extends Component {
   constructor(props) {
@@ -30,9 +29,8 @@ class Listen extends Component {
     this.tomorrowPlaylist = '';
     this.topConcertsPlaylist = '';
     this.interval = null;
-    console.log('asfd',queryString.parse(props.location.hash).access_token)
-    this.accessToken = queryString.parse(props.location.hash).access_token || localStorage.accessToken
-    console.log('THIS.ACCESSTOKEN', this.accessToken)
+    this.accessToken = queryString.parse(props.location.hash).access_token ||
+      localStorage.accessToken;
     localStorage.setItem('accessToken', this.accessToken);
 
     actions.initializeAxios(this.accessToken);
@@ -53,7 +51,7 @@ class Listen extends Component {
       });
     });
   }
-  componentWillMount(){
+  componentWillMount() {
     this.context.router.history.push({
       hash: '',
     });
@@ -147,7 +145,7 @@ class Listen extends Component {
     this.setState({loading: true});
   }
   executeTomorrowConcerts = () => {
-    clearInterval(this.interval)
+    clearInterval(this.interval);
     actions.getPlaylists(this.spotifyUserId).then(res => {
       const playlist = res.data.items.filter(playlist => {
         return playlist.name === this.tomorrowPlaylist;
@@ -240,7 +238,7 @@ class Listen extends Component {
     });
   };
   executeTopConcerts = () => {
-     clearInterval(this.interval)
+    clearInterval(this.interval);
     actions.getPlaylists(this.spotifyUserId).then(res => {
       const playlist = res.data.items.filter(playlist => {
         return playlist.name === this.topConcertsPlaylist;
@@ -370,7 +368,6 @@ class Listen extends Component {
     const {
       concertDate,
       locationName,
-      iframeSrc,
       currentlyPlaying,
       artistsConcerts,
       loading,
