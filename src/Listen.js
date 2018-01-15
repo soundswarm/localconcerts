@@ -14,6 +14,7 @@ class Listen extends Component {
     super(props);
     this.state = {
       artistsConcerts: {topConcerts: [], tomorrowConcerts: []},
+      noTopConcerts: false,
       currentlyPlaying: {},
       locationName: '',
       loading: false,
@@ -135,7 +136,6 @@ class Listen extends Component {
             artists.push({artistName, concert});
           });
         });
-
         return artists.sort((a, b) => {
           return moment(a.concert.start.date) < moment(b.concert.start.date)
             ? -1
@@ -264,6 +264,10 @@ class Listen extends Component {
             .then(() => {
               return this.topArtistsConcerts()
                 .then(artists => {
+                  if (artists.length <= 0) {
+                    this.setState({noTopConcerts: true})
+                    return this.displayTomorrowConcerts();
+                  }
                   artists = artists.slice(0, this.maxSongsToDisplay);
                   const artistsConcerts = {
                     ...this.state.artistsConcerts,
@@ -319,6 +323,10 @@ class Listen extends Component {
 
           this.topArtistsConcerts()
             .then(artists => {
+              if (artists.length <= 0) {
+                this.setState({noTopConcerts: true})
+                return this.displayTomorrowConcerts();
+              }
               artists = artists.slice(0, this.maxSongsToDisplay);
               const artistsConcerts = {...this.state.artistsConcerts};
               artistsConcerts[this.state.view] = artists.slice(
@@ -372,6 +380,7 @@ class Listen extends Component {
       currentlyPlaying,
       artistsConcerts,
       loading,
+      noTopConcerts
     } = this.state;
 
     return (
@@ -386,6 +395,7 @@ class Listen extends Component {
                 artistsConcerts: artistsConcerts.tomorrowConcerts,
                 loading,
                 displayTopConcerts: this.displayTopConcerts,
+                noTopConcerts
               }}
             />
           : <TopConcerts

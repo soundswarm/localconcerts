@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Button} from 'react-bootstrap';
 import HowItWorks from './howItWorks'
+const analytics = window.analytics;
 
 class App extends Component {
   componentDidMount() {
@@ -10,6 +11,7 @@ class App extends Component {
     });
   }
   connectSpotify=()=> {
+    analytics.track('connect button clicked')
     let spotifyAuthUrl = 'https://accounts.spotify.com/authorize?client_id=5558527c701b4eaaa340858ec6cd8cb8&response_type=token&state=123';
     spotifyAuthUrl += `&scope=${encodeURIComponent('playlist-modify-public user-top-read user-read-currently-playing')}`
     spotifyAuthUrl += `&redirect_uri=${window.location.origin}/listen`

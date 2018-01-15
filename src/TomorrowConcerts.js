@@ -14,6 +14,7 @@ export default (
     artistsConcerts,
     loading,
     displayTopConcerts,
+    noTopConcerts
   },
 ) => {
   return (
@@ -25,7 +26,7 @@ export default (
         : null}
 
       <CurrentlyPlaying iframeSrc={iframeSrc} {...currentlyPlaying} />
-      {!loading
+      {!loading && !noTopConcerts
         ? <Button
             className="switchConcertsButton left"
             onClick={() => displayTopConcerts()}
