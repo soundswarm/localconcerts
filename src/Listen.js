@@ -57,35 +57,38 @@ class Listen extends Component {
     });
   }
   getCurrentSongAndDisplay = () => {
-    actions.getCurrentSong().then(res => {
-      const spotifySong = res.data.item;
+    clearInterval(this.interval);
+    const rec = () => {
+      actions.getCurrentSong().then(res => {
+        const spotifySong = res.data.item;
+        if (spotifySong && spotifySong.duration_ms) {
+          this.interval = setTimeout(rec, 6000);
+          const artistPlaying = spotifySong.artists[0].name;
 
-      if (spotifySong && spotifySong.duration_ms) {
-        this.interval = setTimeout(this.getCurrentSongAndDisplay, 6000);
-        const artistPlaying = spotifySong.artists[0].name;
-
-        const newState = {...this.state};
-        this.state.artistsConcerts[this.state.view].forEach((artist, i) => {
-          if (
-            artist.artistName &&
-            artistPlaying &&
-            ss.compareTwoStrings(artist.artistName, artistPlaying) > 0.5
-          ) {
-            newState.artistsConcerts[this.state.view][
-              i
-            ].currentlyPlaying = true;
-            newState.currentlyPlaying = newState.artistsConcerts[
-              this.state.view
-            ][i];
-          } else {
-            newState.artistsConcerts[this.state.view][
-              i
-            ].currentlyPlaying = null;
-          }
-        });
-        this.setState(newState);
-      }
-    });
+          const newState = {...this.state};
+          this.state.artistsConcerts[this.state.view].forEach((artist, i) => {
+            if (
+              artist.artistName &&
+              artistPlaying &&
+              ss.compareTwoStrings(artist.artistName, artistPlaying) > 0.5
+            ) {
+              newState.artistsConcerts[this.state.view][
+                i
+              ].currentlyPlaying = true;
+              newState.currentlyPlaying = newState.artistsConcerts[
+                this.state.view
+              ][i];
+            } else {
+              newState.artistsConcerts[this.state.view][
+                i
+              ].currentlyPlaying = null;
+            }
+          });
+          this.setState(newState);
+        }
+      });
+    };
+    rec();
   };
 
   getUsersAllTopArtists = (url, artists = []) => {
@@ -115,6 +118,7 @@ class Listen extends Component {
       return artists;
     });
   };
+
   topArtistsConcerts = () => {
     return this.getUsersAllTopArtists().then(topArtists => {
       this.userTopArtists = topArtists;
@@ -145,7 +149,6 @@ class Listen extends Component {
     this.setState({loading: true});
   }
   executeTomorrowConcerts = () => {
-    clearInterval(this.interval);
     actions.getPlaylists(this.spotifyUserId).then(res => {
       const playlist = res.data.items.filter(playlist => {
         return playlist.name === this.tomorrowPlaylist;
@@ -155,7 +158,6 @@ class Listen extends Component {
         this.existingPlaylist = true;
         let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
         this.setState({
-          artistsConcerts: {...this.state.artistsConcerts},
           tomorrowIframeSrc: uri,
           loading: false,
         });
@@ -238,7 +240,6 @@ class Listen extends Component {
     });
   };
   executeTopConcerts = () => {
-    clearInterval(this.interval);
     actions.getPlaylists(this.spotifyUserId).then(res => {
       const playlist = res.data.items.filter(playlist => {
         return playlist.name === this.topConcertsPlaylist;

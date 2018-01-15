@@ -1,5 +1,5 @@
 import React from 'react';
-import tenor from './tenor.gif';
+import tenor from './images/tenor.gif';
 import {Button} from 'react-bootstrap';
 import CurrentlyPlaying from './CurrentlyPlaying';
 import Concerts from './Concerts';

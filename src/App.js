@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Button} from 'react-bootstrap';
+import HowItWorks from './howItWorks'
 
 class App extends Component {
   componentDidMount() {
@@ -18,6 +19,7 @@ class App extends Component {
   render() {
     return (
       <div className="landingApp">
+        <div className='mainSection'>
         <div className="title">
           SEE
           <div>
@@ -28,6 +30,8 @@ class App extends Component {
           Connect to create a Spotify playlist of your favorite artists who are playing concerts near you
         </div>
         <Button onClick={this.connectSpotify}>Connect with Spotify</Button>
+      </div>
+      {/* <HowItWorks/> */}
       </div>
     );
   }
