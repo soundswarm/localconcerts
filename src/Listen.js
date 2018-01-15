@@ -266,6 +266,7 @@ class Listen extends Component {
                 .then(artists => {
                   if (artists.length <= 0) {
                     this.setState({noTopConcerts: true})
+                    analytics.track('no top artists')
                     return this.displayTomorrowConcerts();
                   }
                   artists = artists.slice(0, this.maxSongsToDisplay);
@@ -325,6 +326,7 @@ class Listen extends Component {
             .then(artists => {
               if (artists.length <= 0) {
                 this.setState({noTopConcerts: true})
+                analytics.track('no top artists')
                 return this.displayTomorrowConcerts();
               }
               artists = artists.slice(0, this.maxSongsToDisplay);
