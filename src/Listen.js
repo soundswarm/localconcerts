@@ -162,7 +162,7 @@ class Listen extends Component {
           loading: false,
         });
         analytics.track('iframeLoadedFromExisting', {uri});
-        // this.getCurrentSongAndDisplay();
+        this.getCurrentSongAndDisplay();
         this.artistsPlayingConcertsTomorrow().then(artists => {
           const artistsConcerts = {...this.state.artistsConcerts};
           artistsConcerts[this.state.view] = artists.slice(
@@ -228,7 +228,7 @@ class Listen extends Component {
                   tracks,
                 })
                 .then(t => {
-                  // this.getCurrentSongAndDisplay();
+                  this.getCurrentSongAndDisplay();
                   this.setState({
                     tomorrowIframeSrc: uri,
                     loading: false,
@@ -287,6 +287,7 @@ class Listen extends Component {
                   );
                 })
                 .then(tracks => {
+                  tracks = tracks.filter(track => !_.isNil(track));
                   return actions
                     .addTracksToPlaylist({
                       playlistId: playlist.id,
@@ -345,6 +346,7 @@ class Listen extends Component {
               );
             })
             .then(tracks => {
+              tracks = tracks.filter(track => !_.isNil(track));
               return actions
                 .addTracksToPlaylist({
                   playlistId: this.playListId,
