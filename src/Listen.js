@@ -220,7 +220,6 @@ class Listen extends Component {
                 0,
                 this.maxSongsToDisplay,
               );
-              this.setState({artistsConcerts});
               actions
                 .addTracksToPlaylist({
                   playlistId: this.playListId,
@@ -265,8 +264,8 @@ class Listen extends Component {
               return this.topArtistsConcerts()
                 .then(artists => {
                   if (artists.length <= 0) {
-                    this.setState({noTopConcerts: true})
-                    analytics.track('no top artists')
+                    this.setState({noTopConcerts: true});
+                    analytics.track('no top artists');
                     return this.displayTomorrowConcerts();
                   }
                   artists = artists.slice(0, this.maxSongsToDisplay);
@@ -326,8 +325,8 @@ class Listen extends Component {
           this.topArtistsConcerts()
             .then(artists => {
               if (artists.length <= 0) {
-                this.setState({noTopConcerts: true})
-                analytics.track('no top artists')
+                this.setState({noTopConcerts: true});
+                analytics.track('no top artists');
                 return this.displayTomorrowConcerts();
               }
               artists = artists.slice(0, this.maxSongsToDisplay);
@@ -384,7 +383,7 @@ class Listen extends Component {
       currentlyPlaying,
       artistsConcerts,
       loading,
-      noTopConcerts
+      noTopConcerts,
     } = this.state;
 
     return (
@@ -399,7 +398,7 @@ class Listen extends Component {
                 artistsConcerts: artistsConcerts.tomorrowConcerts,
                 loading,
                 displayTopConcerts: this.displayTopConcerts,
-                noTopConcerts
+                noTopConcerts,
               }}
             />
           : <TopConcerts

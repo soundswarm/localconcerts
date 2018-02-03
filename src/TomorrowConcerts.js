@@ -14,7 +14,7 @@ export default (
     artistsConcerts,
     loading,
     displayTopConcerts,
-    noTopConcerts
+    noTopConcerts,
   },
 ) => {
   return (
@@ -34,18 +34,18 @@ export default (
             Show My Top Concerts
           </Button>
         : null}
-        <div className="listenTitle">
-          <div>
-            CONCERTS
-          </div>
-          {concertDate ? <div className="on">on</div> : null}
-          <div>
-            {concertDate ? moment(concertDate).format('ddd MMM D') : null}
-          </div>
-          <div>
-            {locationName}
-          </div>
+      <div className="listenTitle">
+        <div>
+          CONCERTS
         </div>
+        {concertDate ? <div className="on">on</div> : null}
+        <div>
+          {concertDate ? moment(concertDate).format('ddd MMM D') : null}
+        </div>
+        <div>
+          {locationName}
+        </div>
+      </div>
       <Concerts
         currentlyPlaying={currentlyPlaying}
         artistsConcerts={artistsConcerts}
