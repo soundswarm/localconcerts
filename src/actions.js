@@ -113,7 +113,7 @@ export const getSpotifyUser = () => {
   return ax({
     method: 'get',
     url: 'https://api.spotify.com/v1/me',
-  });
+  })
 };
 
 export const getArtistTrack = (artistName) => {

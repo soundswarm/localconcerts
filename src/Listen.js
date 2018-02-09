@@ -36,6 +36,10 @@ class Listen extends Component {
 
     actions.initializeAxios(this.accessToken);
     actions.getSpotifyUser().then(res => {
+      if (res.status !== 200) {
+        this.context.router.push('/');
+      }
+
       this.spotifyUserId = res.data.id;
       analytics.identify(this.spotifyUserId, {
         ...res.data,
