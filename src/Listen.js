@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -13,14 +13,14 @@ class Listen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      artistsConcerts: {topConcerts: [], tomorrowConcerts: []},
+      artistsConcerts: { topConcerts: [], tomorrowConcerts: [] },
       noTopConcerts: false,
       currentlyPlaying: {},
       locationName: '',
       loading: false,
       view: 'topConcerts',
       topIframeSrc: '',
-      tomorrowIframeSrc: '',
+      tomorrowIframeSrc: ''
     };
     this.ax = null;
     this.concertDate = null;
@@ -30,7 +30,8 @@ class Listen extends Component {
     this.tomorrowPlaylist = '';
     this.topConcertsPlaylist = '';
     this.interval = null;
-    this.accessToken = queryString.parse(props.location.hash).access_token ||
+    this.accessToken =
+      queryString.parse(props.location.hash).access_token ||
       localStorage.accessToken;
     localStorage.setItem('accessToken', this.accessToken);
 
@@ -42,13 +43,12 @@ class Listen extends Component {
 
       this.spotifyUserId = res.data.id;
       analytics.identify(this.spotifyUserId, {
-        ...res.data,
+        ...res.data
       });
       actions.getLocation().then(loc => {
-        const locationName = loc.data.resultsPage.results.location[
-          0
-        ].city.displayName;
-        this.setState({locationName});
+        const locationName =
+          loc.data.resultsPage.results.location[0].city.displayName;
+        this.setState({ locationName });
 
         this.display(locationName);
 
@@ -58,7 +58,7 @@ class Listen extends Component {
   }
   componentWillMount() {
     this.context.router.history.push({
-      hash: '',
+      hash: ''
     });
   }
   getCurrentSongAndDisplay = () => {
@@ -70,7 +70,7 @@ class Listen extends Component {
           this.interval = setTimeout(rec, 6000);
           const artistPlaying = spotifySong.artists[0].name;
 
-          const newState = {...this.state};
+          const newState = { ...this.state };
           this.state.artistsConcerts[this.state.view].forEach((artist, i) => {
             if (
               artist.artistName &&
@@ -80,9 +80,8 @@ class Listen extends Component {
               newState.artistsConcerts[this.state.view][
                 i
               ].currentlyPlaying = true;
-              newState.currentlyPlaying = newState.artistsConcerts[
-                this.state.view
-              ][i];
+              newState.currentlyPlaying =
+                newState.artistsConcerts[this.state.view][i];
             } else {
               newState.artistsConcerts[this.state.view][
                 i
@@ -116,7 +115,7 @@ class Listen extends Component {
         concert.performance.forEach(artist => {
           const artistName = artist.artist.displayName;
           if (moment(concert.start.date).format('l') === tomorrow.format('l')) {
-            artists.push({artistName, concert});
+            artists.push({ artistName, concert });
           }
         });
       });
@@ -130,14 +129,14 @@ class Listen extends Component {
       return Promise.all(
         topArtists.map(artist => {
           return actions.getArtistConcerts(artist.name);
-        }),
+        })
       ).then(re => {
         const artists = [];
         re.filter(r => r.data.resultsPage.totalEntries > 0).forEach(res => {
           const concert = res.data.resultsPage.results.event[0];
           concert.performance.forEach(artist => {
             const artistName = artist.artist.displayName;
-            artists.push({artistName, concert});
+            artists.push({ artistName, concert });
           });
         });
         return artists.sort((a, b) => {
@@ -150,7 +149,7 @@ class Listen extends Component {
   };
 
   componentDidMount() {
-    this.setState({loading: true});
+    this.setState({ loading: true });
   }
   executeTomorrowConcerts = () => {
     actions.getPlaylists(this.spotifyUserId).then(res => {
@@ -163,19 +162,19 @@ class Listen extends Component {
         let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
         this.setState({
           tomorrowIframeSrc: uri,
-          loading: false,
+          loading: false
         });
-        analytics.track('iframeLoadedFromExisting', {uri});
+        analytics.track('iframeLoadedFromExisting', { uri });
         this.getCurrentSongAndDisplay();
         this.artistsPlayingConcertsTomorrow().then(artists => {
-          const artistsConcerts = {...this.state.artistsConcerts};
+          const artistsConcerts = { ...this.state.artistsConcerts };
           artistsConcerts[this.state.view] = artists.slice(
             0,
-            this.maxSongsToDisplay,
+            this.maxSongsToDisplay
           );
-          this.setState({artistsConcerts});
+          this.setState({ artistsConcerts });
           this.setState({
-            concertDate: artistsConcerts[this.state.view][0].concert.start.date,
+            concertDate: artistsConcerts[this.state.view][0].concert.start.date
           });
         });
         return;
@@ -187,9 +186,9 @@ class Listen extends Component {
         .createNewPlaylist(
           {
             name: this.tomorrowPlaylist,
-            description: 'A playlist by seemusiq.com',
+            description: 'A playlist by seemusiq.com'
           },
-          this.spotifyUserId,
+          this.spotifyUserId
         )
         .then(r => {
           // handle this
@@ -201,42 +200,42 @@ class Listen extends Component {
               artists = artists.slice(0, this.maxSongsToDisplay);
 
               const artistsConcertsNewState = {
-                ...this.state.artistsConcerts,
+                ...this.state.artistsConcerts
               };
               artistsConcertsNewState.tomorrowConcerts = artists.slice(
                 0,
-                this.maxSongsToDisplay,
+                this.maxSongsToDisplay
               );
 
               this.setState({
-                artistsConcerts: artistsConcertsNewState,
+                artistsConcerts: artistsConcertsNewState
               });
               return Promise.all(
-                artists.map(({artistName, concert}) => {
+                artists.map(({ artistName, concert }) => {
                   return actions.getArtistTrack(artistName);
-                }),
+                })
               );
             })
             .then(tracks => {
               tracks = tracks.filter(track => !_.isNil(track));
-              const artistsConcerts = {...this.state.artistsConcerts};
+              const artistsConcerts = { ...this.state.artistsConcerts };
               artistsConcerts[this.state.view] = tracks.slice(
                 0,
-                this.maxSongsToDisplay,
+                this.maxSongsToDisplay
               );
               actions
                 .addTracksToPlaylist({
                   playlistId: this.playListId,
                   spotifyUserId: this.spotifyUserId,
-                  tracks,
+                  tracks
                 })
                 .then(t => {
                   this.getCurrentSongAndDisplay();
                   this.setState({
                     tomorrowIframeSrc: uri,
-                    loading: false,
+                    loading: false
                   });
-                  analytics.track('iframeLoadedFromNew', {uri});
+                  analytics.track('iframeLoadedFromNew', { uri });
                 });
             });
         });
@@ -251,42 +250,42 @@ class Listen extends Component {
         this.playlistId = playlist.id;
         this.existingPlaylist = true;
         let uri = 'https://open.spotify.com/embed?uri=' + playlist.uri;
-        this.setState({topIframeSrc: uri, loading: false});
-        analytics.track('iframeLoadedFromExisting', {uri});
+        this.setState({ topIframeSrc: uri, loading: false });
+        analytics.track('iframeLoadedFromExisting', { uri });
 
         actions.getPlaylistTracks(playlist.href).then(res => {
           const playlistTracks = res.data.tracks.items.map((track, i) => {
-            return {uri: track.track.uri, positions: [i]};
+            return { uri: track.track.uri, positions: [i] };
           });
           return actions
             .deletePlaylistTracks(
               this.spotifyUserId,
               playlist.id,
-              playlistTracks,
+              playlistTracks
             )
             .then(() => {
               return this.topArtistsConcerts()
                 .then(artists => {
                   if (artists.length <= 0) {
-                    this.setState({noTopConcerts: true});
+                    this.setState({ noTopConcerts: true });
                     analytics.track('no top artists');
                     return this.displayTomorrowConcerts();
                   }
                   artists = artists.slice(0, this.maxSongsToDisplay);
                   const artistsConcerts = {
-                    ...this.state.artistsConcerts,
+                    ...this.state.artistsConcerts
                   };
                   artistsConcerts[this.state.view] = artists.slice(
                     0,
-                    this.maxSongsToDisplay,
+                    this.maxSongsToDisplay
                   );
                   this.setState({
-                    artistsConcerts,
+                    artistsConcerts
                   });
                   return Promise.all(
-                    artists.map(({artistName, concert}) => {
+                    artists.map(({ artistName, concert }) => {
                       return actions.getArtistTrack(artistName);
-                    }),
+                    })
                   );
                 })
                 .then(tracks => {
@@ -295,15 +294,15 @@ class Listen extends Component {
                     .addTracksToPlaylist({
                       playlistId: playlist.id,
                       spotifyUserId: this.spotifyUserId,
-                      tracks,
+                      tracks
                     })
                     .then(() => {
                       this.getCurrentSongAndDisplay();
                       this.setState({
                         topIframeSrc: uri,
-                        loading: false,
+                        loading: false
                       });
-                      analytics.track('iframeLoadedFromNew', {uri});
+                      analytics.track('iframeLoadedFromNew', { uri });
                     });
                 });
             });
@@ -317,9 +316,9 @@ class Listen extends Component {
         .createNewPlaylist(
           {
             name: this.topConcertsPlaylist,
-            description: 'A playlist by seemusiq.com',
+            description: 'A playlist by seemusiq.com'
           },
-          this.spotifyUserId,
+          this.spotifyUserId
         )
         .then(r => {
           // handle this
@@ -329,23 +328,23 @@ class Listen extends Component {
           this.topArtistsConcerts()
             .then(artists => {
               if (artists.length <= 0) {
-                this.setState({noTopConcerts: true});
+                this.setState({ noTopConcerts: true });
                 analytics.track('no top artists');
                 return this.displayTomorrowConcerts();
               }
               artists = artists.slice(0, this.maxSongsToDisplay);
-              const artistsConcerts = {...this.state.artistsConcerts};
+              const artistsConcerts = { ...this.state.artistsConcerts };
               artistsConcerts[this.state.view] = artists.slice(
                 0,
-                this.maxSongsToDisplay,
+                this.maxSongsToDisplay
               );
               this.setState({
-                artistsConcerts,
+                artistsConcerts
               });
               return Promise.all(
-                artists.map(({artistName, concert}) => {
+                artists.map(({ artistName, concert }) => {
                   return actions.getArtistTrack(artistName);
-                }),
+                })
               );
             })
             .then(tracks => {
@@ -354,15 +353,15 @@ class Listen extends Component {
                 .addTracksToPlaylist({
                   playlistId: this.playListId,
                   spotifyUserId: this.spotifyUserId,
-                  tracks,
+                  tracks
                 })
                 .then(() => {
                   this.getCurrentSongAndDisplay();
                   this.setState({
                     topIframeSrc: uri,
-                    loading: false,
+                    loading: false
                   });
-                  analytics.track('iframeLoadedFromNew', {uri});
+                  analytics.track('iframeLoadedFromNew', { uri });
                 });
             });
         });
@@ -370,15 +369,17 @@ class Listen extends Component {
   };
   display = locationName => {
     this.topConcertsPlaylist = 'Top Concerts';
-    let tomorrow = moment(new Date()).add(1, 'days').format('MMM DD');
+    let tomorrow = moment(new Date())
+      .add(1, 'days')
+      .format('MMM DD');
     this.tomorrowPlaylist = locationName + ` - ${tomorrow}`;
   };
   displayTomorrowConcerts = () => {
     this.executeTomorrowConcerts(this.spotify);
-    this.setState({view: 'tomorrowConcerts'});
+    this.setState({ view: 'tomorrowConcerts' });
   };
   displayTopConcerts = () => {
-    this.setState({view: 'topConcerts'});
+    this.setState({ view: 'topConcerts' });
   };
   render() {
     const {
@@ -387,41 +388,43 @@ class Listen extends Component {
       currentlyPlaying,
       artistsConcerts,
       loading,
-      noTopConcerts,
+      noTopConcerts
     } = this.state;
-
+    console.log('ts', this.state);
     return (
       <div className="app">
-        {this.state.view === 'tomorrowConcerts'
-          ? <TomorrowConcerts
-              {...{
-                concertDate,
-                locationName,
-                iframeSrc: this.state.tomorrowIframeSrc,
-                currentlyPlaying,
-                artistsConcerts: artistsConcerts.tomorrowConcerts,
-                loading,
-                displayTopConcerts: this.displayTopConcerts,
-                noTopConcerts,
-              }}
-            />
-          : <TopConcerts
-              {...{
-                concertDate,
-                locationName,
-                iframeSrc: this.state.topIframeSrc,
-                currentlyPlaying,
-                artistsConcerts: artistsConcerts.topConcerts,
-                loading,
-                displayTomorrowConcerts: this.displayTomorrowConcerts,
-              }}
-            />}
+        {this.state.view === 'tomorrowConcerts' ? (
+          <TomorrowConcerts
+            {...{
+              concertDate,
+              locationName,
+              iframeSrc: this.state.tomorrowIframeSrc,
+              currentlyPlaying,
+              artistsConcerts: artistsConcerts.tomorrowConcerts,
+              loading,
+              displayTopConcerts: this.displayTopConcerts,
+              noTopConcerts
+            }}
+          />
+        ) : (
+          <TopConcerts
+            {...{
+              concertDate,
+              locationName,
+              iframeSrc: this.state.topIframeSrc,
+              currentlyPlaying,
+              artistsConcerts: artistsConcerts.topConcerts,
+              loading,
+              displayTomorrowConcerts: this.displayTomorrowConcerts
+            }}
+          />
+        )}
       </div>
     );
   }
 }
 
 Listen.contextTypes = {
-  router: PropTypes.object,
+  router: PropTypes.object
 };
 export default Listen;

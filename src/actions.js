@@ -2,6 +2,7 @@ import axios from 'axios';
 import moment from 'moment';
 
 const userip = window.userip;
+console.log('USERIP', userip)
 const url = 'https://api.spotify.com/v1/';
 
 let ax = null;

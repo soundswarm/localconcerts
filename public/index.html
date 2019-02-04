@@ -15,7 +15,13 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
     <script type="text/javascript" src="https://www.l2.io/ip.js?var=userip"></script>
+    <script type="application/javascript">
+      function getIP(json) {
+        window.userip = json.ip;
+      }
+    </script>
 
+    <script type="application/javascript" src="https://api.ipify.org?format=jsonp&callback=getIP"></script>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
