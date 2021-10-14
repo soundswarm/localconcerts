@@ -31,7 +31,7 @@ class App extends Component {
           <div className="subtitle">
             Connect to create a Spotify playlist of your favorite artists who are playing concerts near you
           </div>
-          <Button onClick={this.connectSpotify}>Connect with Spotify</Button>
+          <Button   className="button" onClick={this.connectSpotify}>Connect with Spotify</Button>
         </div>
         {/* <HowItWorks/> */}
       </div>

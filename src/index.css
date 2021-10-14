@@ -80,6 +80,10 @@ body {
   margin-bottom: 45px;
   font-size: 20px;
 }
+.button {
+  color: white;
+  border: white solid 2px;
+}
 .listenTitle {
   margin-bottom: 30px;
   font-size: 18px;
@@ -96,6 +100,9 @@ body {
 
 .switchConcertsButton {
   margin-bottom: 36px;
+  color: white;
+  border: white solid 2px;
+
 
 }
 
